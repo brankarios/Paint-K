@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+
+<BorderPane prefHeight="600.0" prefWidth="1224.0" style="-fx-background-color: #1e1e1e;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Proyecto1">
+    <center>
+        <ImageView fx:id="viewport" fitHeight="600.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+    </center>
+    <right>
+        <VBox prefWidth="200.0" spacing="15.0" style="-fx-background-color: #2b2b2b;" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <children>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Herramientas" />
+                <Separator prefWidth="200.0" />
+                <Label style="-fx-text-fill: #aaaaaa;" text="Color Pincel:" />
+                <ColorPicker fx:id="fxColorPicker" maxWidth="1.7976931348623157E308">
+                    <value>
+                        <Color red="1.0" />
+                    </value>
+                </ColorPicker>
+                <Separator prefWidth="200.0" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 11px;" text="• Click Izq. para pintar" wrapText="true" />
+                <Label style="-fx-text-fill: white; -fx-font-size: 11px;" text="• Espacio para limpiar" wrapText="true" />
+            </children>
+        </VBox>
+    </right>
+</BorderPane>
