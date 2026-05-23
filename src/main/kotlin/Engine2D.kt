@@ -77,7 +77,7 @@ abstract class Engine2D {
     }
 
     //API
-    protected fun putPixel(x: Int, y: Int, color: Color) {
+    fun putPixel(x: Int, y: Int, color: Color) {
         if (x < 0 || x >= width || y < 0 || y >= height) return
         val index = (y * width + x) * 3
         pixelData[index] = color.r
@@ -85,7 +85,7 @@ abstract class Engine2D {
         pixelData[index + 2] = color.b
     }
 
-    protected fun clear(color: Color) {
+    fun clear(color: Color) {
         var i = 0
         while (i < pixelData.size) {
             pixelData[i] = color.r
