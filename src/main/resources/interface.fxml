@@ -1,36 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.paint.Color?>
+<?import javafx.scene.layout.Region?>
 
-<BorderPane prefHeight="600.0" prefWidth="1224.0" style="-fx-background-color: #1e1e1e;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Proyecto1">
-    <center>
-        <ImageView fx:id="viewport" fitHeight="600.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
-    </center>
-    <right>
-        <VBox prefWidth="200.0" spacing="15.0" style="-fx-background-color: #2b2b2b;" BorderPane.alignment="CENTER">
+<BorderPane prefHeight="660.0" prefWidth="1024.0" style="-fx-background-color: #1e1e1e;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Proyecto1">
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" style="-fx-background-color: #2b2b2b; -fx-border-color: #3e3e3e; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
             <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
             </padding>
             <children>
-                <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Herramientas" />
-                <Separator prefWidth="200.0" />
-                <Label style="-fx-text-fill: #aaaaaa;" text="Color Pincel:" />
-                <ColorPicker fx:id="fxColorPicker" maxWidth="1.7976931348623157E308">
+                <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Herramientas:" />
+                
+                <Button fx:id="btnLine" mnemonicParsing="false" onAction="#setToolLine" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Línea" />
+                <Button fx:id="btnRectangle" mnemonicParsing="false" onAction="#setToolRectangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Rectángulo" />
+                <Button fx:id="btnCircle" mnemonicParsing="false" onAction="#setToolCircle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Círculo" />
+                <Button fx:id="btnTriangle" mnemonicParsing="false" onAction="#setToolTriangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Triángulo" />
+                <Button fx:id="btnBezier" mnemonicParsing="false" onAction="#setToolBezier" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Curvas" />
+                
+                <Separator orientation="VERTICAL" prefHeight="200.0" />
+                
+                <Label style="-fx-text-fill: #aaaaaa;" text="Color:" />
+                <ColorPicker fx:id="fxColorPicker" prefWidth="100.0">
                     <value>
                         <Color red="1.0" />
                     </value>
                 </ColorPicker>
-                <Separator prefWidth="200.0" />
-                <Label style="-fx-text-fill: white; -fx-font-size: 11px;" text="• Click Izq. para pintar" wrapText="true" />
-                <Label style="-fx-text-fill: white; -fx-font-size: 11px;" text="• Espacio para limpiar" wrapText="true" />
+
+                <Button fx:id="btnFill" mnemonicParsing="false" onAction="#toggleFill" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Relleno (F)" />
+                
+                <Region HBox.hgrow="ALWAYS" />
+                
+                <Button mnemonicParsing="false" onAction="#clearCanvas" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Limpiar (Espacio)" />
             </children>
-        </VBox>
-    </right>
+        </HBox>
+    </top>
+    <center>
+        <ImageView fx:id="viewport" fitHeight="600.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+    </center>
 </BorderPane>

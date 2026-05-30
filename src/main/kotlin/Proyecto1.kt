@@ -8,19 +8,26 @@ enum class Tool {
     LINE,
     RECTANGLE,
     CIRCLE,
-    TRIANGLE
+    TRIANGLE,
+    BEZIER
 }
 
 class Proyecto1 : Engine2D() {
 
     @FXML private lateinit var viewport: ImageView
     @FXML private lateinit var fxColorPicker: ColorPicker
+    @FXML private lateinit var btnLine: javafx.scene.control.Button
+    @FXML private lateinit var btnRectangle: javafx.scene.control.Button
+    @FXML private lateinit var btnCircle: javafx.scene.control.Button
+    @FXML private lateinit var btnTriangle: javafx.scene.control.Button
+    @FXML private lateinit var btnBezier: javafx.scene.control.Button
+    @FXML private lateinit var btnFill: javafx.scene.control.Button
     
     // Variables de estado del Proyecto
     private var currentColor = Color.RED
     private var isDrawing = false
     private var currentTool = Tool.LINE 
-    private var isFilled = true
+    private var isFilled = false
     
     private val shapes = mutableListOf<Shape>()
     
@@ -30,9 +37,12 @@ class Proyecto1 : Engine2D() {
     // Variables para recordar la posición real del mouse y aplicar la restricción si se pulsa Ctrl sin moverlo
     private var lastMouseX = 0
     private var lastMouseY = 0
+    
+    // Rastreador de tiempo para detectar Doble Clic en Bézier
+    private var lastClickTime: Long = 0
 
+    // Estado especial para el Triángulo (requiere 3 vértices)
     private var triangleStep = 0
-
     @FXML
     fun initialize() {
         bindEngine(viewport, 1024, 600)
@@ -42,12 +52,38 @@ class Proyecto1 : Engine2D() {
             val jfxColor = fxColorPicker.value
             currentColor = Color(jfxColor.red.toFloat(), jfxColor.green.toFloat(), jfxColor.blue.toFloat())
         }
+        updateActiveButtonUI()
+    }
+
+    private fun updateActiveButtonUI() {
+        val defaultStyle = "-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;"
+        val activeStyle = "-fx-background-color: #4a90e2; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
+        
+        if (!::btnLine.isInitialized) return
+        
+        btnLine.style = if (currentTool == Tool.LINE) activeStyle else defaultStyle
+        btnRectangle.style = if (currentTool == Tool.RECTANGLE) activeStyle else defaultStyle
+        btnCircle.style = if (currentTool == Tool.CIRCLE) activeStyle else defaultStyle
+        btnTriangle.style = if (currentTool == Tool.TRIANGLE) activeStyle else defaultStyle
+        btnBezier.style = if (currentTool == Tool.BEZIER) activeStyle else defaultStyle
+        
+        btnFill.style = if (isFilled) activeStyle else defaultStyle
     }
 
     override fun setup() {
         // Setup is called once. Clearing is now handled in update() per frame.
     }
 
+    // --- MÉTODOS DE LA INTERFAZ GRÁFICA (@FXML) ---
+    @FXML fun setToolLine() { currentTool = Tool.LINE; currentShape = null; updateActiveButtonUI(); println("Herramienta: LÍNEA") }
+    @FXML fun setToolRectangle() { currentTool = Tool.RECTANGLE; currentShape = null; updateActiveButtonUI(); println("Herramienta: RECTÁNGULO") }
+    @FXML fun setToolCircle() { currentTool = Tool.CIRCLE; currentShape = null; updateActiveButtonUI(); println("Herramienta: CÍRCULO") }
+    @FXML fun setToolTriangle() { currentTool = Tool.TRIANGLE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: TRIÁNGULO") }
+    @FXML fun setToolBezier() { currentTool = Tool.BEZIER; currentShape = null; updateActiveButtonUI(); println("Herramienta: BÉZIER") }
+    @FXML fun toggleFill() { isFilled = !isFilled; updateActiveButtonUI(); println("Modo Relleno: ${if(isFilled) "ON" else "OFF"}") }
+    @FXML fun clearCanvas() { shapes.clear(); currentShape = null; triangleStep = 0; println("Lienzo limpio") }
+
+    // Este método es el Bucle de Juego (Game Loop), corre automáticamente 60 veces por segundo
     override fun update(deltaTime: Float) {
         // 1. Limpiamos toda la pantalla pintándola de negro
         clear(Color.BACKGROUND)
@@ -111,6 +147,13 @@ class Proyecto1 : Engine2D() {
                         shape.y2 = targetY
                     }
                 }
+                is Bezier -> {
+                    // Actualizamos siempre el último punto de la lista para lograr el preview de la curva
+                    if (shape.controlPoints.isNotEmpty()) {
+                        shape.controlPoints.last().x = targetX.toDouble()
+                        shape.controlPoints.last().y = targetY.toDouble()
+                    }
+                }
             }
         }
     }
@@ -126,26 +169,37 @@ class Proyecto1 : Engine2D() {
             KeyCode.L -> {
                 currentTool = Tool.LINE
                 currentShape = null
+                updateActiveButtonUI()
                 println("Herramienta seleccionada: LÍNEA")
             }
             KeyCode.R -> {
                 currentTool = Tool.RECTANGLE
                 currentShape = null
+                updateActiveButtonUI()
                 println("Herramienta seleccionada: RECTÁNGULO")
             }
             KeyCode.C -> {
                 currentTool = Tool.CIRCLE
                 currentShape = null
+                updateActiveButtonUI()
                 println("Herramienta seleccionada: CÍRCULO (ELIPSE)")
             }
             KeyCode.T -> {
                 currentTool = Tool.TRIANGLE
                 currentShape = null
                 triangleStep = 0
+                updateActiveButtonUI()
                 println("Herramienta seleccionada: TRIÁNGULO")
+            }
+            KeyCode.B -> {
+                currentTool = Tool.BEZIER
+                currentShape = null
+                updateActiveButtonUI()
+                println("Herramienta seleccionada: BÉZIER")
             }
             KeyCode.F -> {
                 isFilled = !isFilled
+                updateActiveButtonUI()
                 println("Modo Relleno alternado a: ${if (isFilled) "ACTIVADO" else "DESACTIVADO"}")
             }
             KeyCode.CONTROL -> {
@@ -165,6 +219,10 @@ class Proyecto1 : Engine2D() {
 
     // Cuando el usuario hace clic (presiona el botón)
     override fun onMouseButtonDown(button: MouseButton, x: Double, y: Double) {
+        val currentTime = System.currentTimeMillis()
+        val isDoubleClick = (currentTime - lastClickTime) < 300 // Umbral de 300ms para doble clic
+        lastClickTime = currentTime
+
         if (button == MouseButton.PRIMARY) {
             isDrawing = true
             lastMouseX = x.toInt()
@@ -176,7 +234,25 @@ class Proyecto1 : Engine2D() {
                 null
             }
 
-            if (currentTool == Tool.TRIANGLE) {
+            if (currentTool == Tool.BEZIER) {
+                if (isDoubleClick && currentShape is Bezier) {
+                    // Doble clic detectado: Finalizamos la curva de Bézier
+                    updateCurrentShape()
+                    currentShape?.let { shapes.add(it) }
+                    currentShape = null
+                    isDrawing = false
+                    println("Curva de Bézier terminada.")
+                } else {
+                    if (currentShape !is Bezier) {
+                        // Iniciamos una nueva curva de Bézier con dos puntos iniciales (inicio y preview)
+                        currentShape = Bezier(mutableListOf(Point2D(x, y), Point2D(x, y)), currentColor)
+                    } else {
+                        // Agregamos un nuevo punto de control de anclaje, el preview se manejará en el último punto
+                        val b = currentShape as Bezier
+                        b.controlPoints.add(Point2D(x, y))
+                    }
+                }
+            } else if (currentTool == Tool.TRIANGLE) {
                 if (triangleStep == 0) {
                     currentShape = Triangle(lastMouseX, lastMouseY, lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor, fillCol)
                     triangleStep = 1
@@ -209,11 +285,11 @@ class Proyecto1 : Engine2D() {
             // Hacemos una última actualización
             updateCurrentShape()
 
-            if (currentTool != Tool.TRIANGLE) {
+            if (currentTool != Tool.TRIANGLE && currentTool != Tool.BEZIER) {
                 currentShape?.let { shapes.add(it) }
                 currentShape = null
                 isDrawing = false
-            } else {
+            } else if (currentTool == Tool.TRIANGLE) {
                 // Soporte para "Arrastrar" vértices de triángulos
                 val t = currentShape as? Triangle
                 if (t != null) {
