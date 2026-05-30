@@ -7,11 +7,12 @@ import javafx.scene.input.MouseButton
 enum class Tool {
     LINE,
     RECTANGLE,
-    CIRCLE
+    CIRCLE,
+    TRIANGLE
 }
 
 class Proyecto1 : Engine2D() {
-    // Controles de la Interfaz inyectados por JavaFX (Visor y Selector de Color)
+
     @FXML private lateinit var viewport: ImageView
     @FXML private lateinit var fxColorPicker: ColorPicker
     
@@ -19,7 +20,7 @@ class Proyecto1 : Engine2D() {
     private var currentColor = Color.RED
     private var isDrawing = false
     private var currentTool = Tool.LINE 
-    private var isFilled = false 
+    private var isFilled = true
     
     private val shapes = mutableListOf<Shape>()
     
@@ -30,9 +31,10 @@ class Proyecto1 : Engine2D() {
     private var lastMouseX = 0
     private var lastMouseY = 0
 
+    private var triangleStep = 0
+
     @FXML
     fun initialize() {
-        // Inicializamos el motor gráfico al tamaño de la ventana (1024x600)
         bindEngine(viewport, 1024, 600)
         
         // Configuramos el selector de color para que cambie nuestro "currentColor"
@@ -46,7 +48,6 @@ class Proyecto1 : Engine2D() {
         // Setup is called once. Clearing is now handled in update() per frame.
     }
 
-    // Este método es el Bucle de Juego (Game Loop), corre automáticamente 60 veces por segundo
     override fun update(deltaTime: Float) {
         // 1. Limpiamos toda la pantalla pintándola de negro
         clear(Color.BACKGROUND)
@@ -65,6 +66,7 @@ class Proyecto1 : Engine2D() {
             var targetX = lastMouseX
             var targetY = lastMouseY
 
+            // Si se oprime Ctrl, forzamos un cuadrado perfecto para Rectángulo y Círculo
             if (isKeyPressed(KeyCode.CONTROL)) {
                 when (shape) {
                     is Rectangle -> {
@@ -97,6 +99,18 @@ class Proyecto1 : Engine2D() {
                     shape.x1 = targetX
                     shape.y1 = targetY
                 }
+                is Triangle -> {
+                    if (triangleStep == 1) {
+                        shape.x1 = targetX
+                        shape.y1 = targetY
+                        // P2 sigue al mouse para que no se dibuje basura
+                        shape.x2 = targetX
+                        shape.y2 = targetY
+                    } else if (triangleStep == 2) {
+                        shape.x2 = targetX
+                        shape.y2 = targetY
+                    }
+                }
             }
         }
     }
@@ -105,35 +119,45 @@ class Proyecto1 : Engine2D() {
     override fun onKeyDown(key: KeyCode) {
         when (key) {
             KeyCode.SPACE -> {
-                // Barra ESPACIADORA: borramos el lienzo
                 shapes.clear()
                 currentShape = null
+                triangleStep = 0
             }
             KeyCode.L -> {
                 currentTool = Tool.LINE
-                println("Herramienta seleccionada: LiNEA")
+                currentShape = null
+                println("Herramienta seleccionada: LÍNEA")
             }
             KeyCode.R -> {
                 currentTool = Tool.RECTANGLE
-                println("Herramienta seleccionada: RECTANGULO")
+                currentShape = null
+                println("Herramienta seleccionada: RECTÁNGULO")
             }
             KeyCode.C -> {
                 currentTool = Tool.CIRCLE
-                println("Herramienta seleccionada: CIRCULO (ELIPSE)")
+                currentShape = null
+                println("Herramienta seleccionada: CÍRCULO (ELIPSE)")
+            }
+            KeyCode.T -> {
+                currentTool = Tool.TRIANGLE
+                currentShape = null
+                triangleStep = 0
+                println("Herramienta seleccionada: TRIÁNGULO")
             }
             KeyCode.F -> {
                 isFilled = !isFilled
                 println("Modo Relleno alternado a: ${if (isFilled) "ACTIVADO" else "DESACTIVADO"}")
             }
             KeyCode.CONTROL -> {
-                if (isDrawing) updateCurrentShape()
+                // Si pulsa Ctrl mientras dibuja, actualizamos la figura al instante
+                if (isDrawing || currentShape != null) updateCurrentShape()
             }
             else -> {}
         }
     }
 
     override fun onKeyUp(key: KeyCode) {
-        if (key == KeyCode.CONTROL && isDrawing) {
+        if (key == KeyCode.CONTROL && (isDrawing || currentShape != null)) {
             // Si suelta Ctrl mientras dibuja, vuelve a la forma libre
             updateCurrentShape()
         }
@@ -152,10 +176,27 @@ class Proyecto1 : Engine2D() {
                 null
             }
 
-            currentShape = when (currentTool) {
-                Tool.LINE -> Line(lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor)
-                Tool.RECTANGLE -> Rectangle(lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor, fillCol)
-                Tool.CIRCLE -> Circle(lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor, fillCol)
+            if (currentTool == Tool.TRIANGLE) {
+                if (triangleStep == 0) {
+                    currentShape = Triangle(lastMouseX, lastMouseY, lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor, fillCol)
+                    triangleStep = 1
+                } else if (triangleStep == 1) {
+                    triangleStep = 2
+                } else if (triangleStep == 2) {
+                    // Tercer punto fijado, terminamos
+                    updateCurrentShape()
+                    currentShape?.let { shapes.add(it) }
+                    currentShape = null
+                    triangleStep = 0
+                    isDrawing = false
+                }
+            } else {
+                currentShape = when (currentTool) {
+                    Tool.LINE -> Line(lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor)
+                    Tool.RECTANGLE -> Rectangle(lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor, fillCol)
+                    Tool.CIRCLE -> Circle(lastMouseX, lastMouseY, lastMouseX, lastMouseY, currentColor, fillCol)
+                    else -> null
+                }
             }
         }
     }
@@ -165,14 +206,29 @@ class Proyecto1 : Engine2D() {
         if (button == MouseButton.PRIMARY) {
             lastMouseX = x.toInt()
             lastMouseY = y.toInt()
-            // Hacemos una última actualización (que aplicará el Ctrl si está presionado)
+            // Hacemos una última actualización
             updateCurrentShape()
 
-            currentShape?.let { shape ->
-                shapes.add(shape)
+            if (currentTool != Tool.TRIANGLE) {
+                currentShape?.let { shapes.add(it) }
+                currentShape = null
+                isDrawing = false
+            } else {
+                // Soporte para "Arrastrar" vértices de triángulos
+                val t = currentShape as? Triangle
+                if (t != null) {
+                    if (triangleStep == 1 && (t.x0 != t.x1 || t.y0 != t.y1)) {
+                        // Si arrastró el ratón tras el 1er clic, asumimos que soltar el ratón fija el 2do vértice
+                        triangleStep = 2
+                    } else if (triangleStep == 2 && (t.x1 != t.x2 || t.y1 != t.y2)) {
+                        // Si arrastró el ratón tras fijar el 2do, soltar el ratón fija el 3er vértice y termina
+                        shapes.add(t)
+                        currentShape = null
+                        triangleStep = 0
+                        isDrawing = false
+                    }
+                }
             }
-            currentShape = null
-            isDrawing = false
         }
     }
 
@@ -180,7 +236,8 @@ class Proyecto1 : Engine2D() {
     override fun onMouseMove(x: Double, y: Double) {
         lastMouseX = x.toInt()
         lastMouseY = y.toInt()
-        if (isDrawing) {
+        // Permitimos actualizar aunque isDrawing sea false para el preview dinámico del triángulo sin hacer clic
+        if (isDrawing || currentShape != null) {
             updateCurrentShape()
         }
     }
