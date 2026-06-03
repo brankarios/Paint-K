@@ -21,6 +21,14 @@ class Triangle(
         drawLine(engine, x2, y2, x0, y0)
     }
 
+    override fun getBounds(): BoundingBox {
+        val minX = minOf(x0, x1, x2).toDouble()
+        val maxX = maxOf(x0, x1, x2).toDouble()
+        val minY = minOf(y0, y1, y2).toDouble()
+        val maxY = maxOf(y0, y1, y2).toDouble()
+        return BoundingBox(minX, minY, maxX - minX, maxY - minY)
+    }
+
     private fun fillScanLine(engine: Engine2D, color: Color) {
         var p0x = x0; var p0y = y0
         var p1x = x1; var p1y = y1

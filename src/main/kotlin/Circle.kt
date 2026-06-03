@@ -78,6 +78,14 @@ class Circle(
         }
     }
 
+    override fun getBounds(): BoundingBox {
+        val minX = kotlin.math.min(x0, x1).toDouble()
+        val maxX = kotlin.math.max(x0, x1).toDouble()
+        val minY = kotlin.math.min(y0, y1).toDouble()
+        val maxY = kotlin.math.max(y0, y1).toDouble()
+        return BoundingBox(minX, minY, maxX - minX, maxY - minY)
+    }
+
     private fun drawEllipsePoints(engine: Engine2D, cx: Int, cy: Int, x: Int, y: Int) {
         if (fillColor != null) {
             val fillCol = fillColor!!

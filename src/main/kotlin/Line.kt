@@ -43,4 +43,12 @@ class Line(var x0: Int, var y0: Int, var x1: Int, var y1: Int, borderColor: Colo
             engine.putPixel(x, y, borderColor)
         }
     }
+
+    override fun getBounds(): BoundingBox {
+        val minX = kotlin.math.min(x0, x1).toDouble()
+        val maxX = kotlin.math.max(x0, x1).toDouble()
+        val minY = kotlin.math.min(y0, y1).toDouble()
+        val maxY = kotlin.math.max(y0, y1).toDouble()
+        return BoundingBox(minX, minY, maxX - minX, maxY - minY)
+    }
 }

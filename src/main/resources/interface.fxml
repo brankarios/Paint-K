@@ -20,6 +20,7 @@
             <children>
                 <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Herramientas:" />
                 
+                <Button fx:id="btnSelect" mnemonicParsing="false" onAction="#setToolSelect" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Seleccionar (S)" />
                 <Button fx:id="btnLine" mnemonicParsing="false" onAction="#setToolLine" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Línea" />
                 <Button fx:id="btnRectangle" mnemonicParsing="false" onAction="#setToolRectangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Rectángulo" />
                 <Button fx:id="btnCircle" mnemonicParsing="false" onAction="#setToolCircle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Círculo" />

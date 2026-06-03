@@ -5,6 +5,7 @@ import javafx.scene.input.KeyCode
 import javafx.scene.input.MouseButton
 
 enum class Tool {
+    SELECT,
     LINE,
     RECTANGLE,
     CIRCLE,
@@ -16,6 +17,7 @@ class Proyecto1 : Engine2D() {
 
     @FXML private lateinit var viewport: ImageView
     @FXML private lateinit var fxColorPicker: ColorPicker
+    @FXML private lateinit var btnSelect: javafx.scene.control.Button
     @FXML private lateinit var btnLine: javafx.scene.control.Button
     @FXML private lateinit var btnRectangle: javafx.scene.control.Button
     @FXML private lateinit var btnCircle: javafx.scene.control.Button
@@ -28,6 +30,11 @@ class Proyecto1 : Engine2D() {
     private var isDrawing = false
     private var currentTool = Tool.LINE 
     private var isFilled = false
+    
+    private var showQuadTree = false
+    private var selectedShape: Shape? = null
+    private var selectedControlPointIndex: Int? = null
+    private var quadTree: QuadTree = QuadTree(BoundingBox(0.0, 0.0, 1024.0, 600.0))
     
     private val shapes = mutableListOf<Shape>()
     
@@ -61,6 +68,7 @@ class Proyecto1 : Engine2D() {
         
         if (!::btnLine.isInitialized) return
         
+        btnSelect.style = if (currentTool == Tool.SELECT) activeStyle else defaultStyle
         btnLine.style = if (currentTool == Tool.LINE) activeStyle else defaultStyle
         btnRectangle.style = if (currentTool == Tool.RECTANGLE) activeStyle else defaultStyle
         btnCircle.style = if (currentTool == Tool.CIRCLE) activeStyle else defaultStyle
@@ -75,26 +83,90 @@ class Proyecto1 : Engine2D() {
     }
 
     // --- MÉTODOS DE LA INTERFAZ GRÁFICA (@FXML) ---
-    @FXML fun setToolLine() { currentTool = Tool.LINE; currentShape = null; updateActiveButtonUI(); println("Herramienta: LÍNEA") }
-    @FXML fun setToolRectangle() { currentTool = Tool.RECTANGLE; currentShape = null; updateActiveButtonUI(); println("Herramienta: RECTÁNGULO") }
-    @FXML fun setToolCircle() { currentTool = Tool.CIRCLE; currentShape = null; updateActiveButtonUI(); println("Herramienta: CÍRCULO") }
+    @FXML fun setToolSelect() { currentTool = Tool.SELECT; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: SELECCIONAR") }
+    @FXML fun setToolLine() { currentTool = Tool.LINE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: LÍNEA") }
+    @FXML fun setToolRectangle() { currentTool = Tool.RECTANGLE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: RECTÁNGULO") }
+    @FXML fun setToolCircle() { currentTool = Tool.CIRCLE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: CÍRCULO") }
     @FXML fun setToolTriangle() { currentTool = Tool.TRIANGLE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: TRIÁNGULO") }
-    @FXML fun setToolBezier() { currentTool = Tool.BEZIER; currentShape = null; updateActiveButtonUI(); println("Herramienta: BÉZIER") }
+    @FXML fun setToolBezier() { currentTool = Tool.BEZIER; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: BÉZIER") }
     @FXML fun toggleFill() { isFilled = !isFilled; updateActiveButtonUI(); println("Modo Relleno: ${if(isFilled) "ON" else "OFF"}") }
-    @FXML fun clearCanvas() { shapes.clear(); currentShape = null; triangleStep = 0; println("Lienzo limpio") }
+    @FXML fun clearCanvas() { shapes.clear(); currentShape = null; triangleStep = 0; selectedShape = null; println("Lienzo limpio") }
 
     // Este método es el Bucle de Juego (Game Loop), corre automáticamente 60 veces por segundo
     override fun update(deltaTime: Float) {
         // 1. Limpiamos toda la pantalla pintándola de negro
         clear(Color.BACKGROUND)
         
-        // 2. Dibujamos TODAS las figuras que ya están guardadas en nuestra lista de memoria
+        // 2. Reconstruimos el QuadTree para el estado actual de las figuras
+        quadTree.clear()
+        for (shape in shapes) {
+            quadTree.insert(shape)
+        }
+
+        // 3. Dibujamos TODAS las figuras que ya están guardadas en nuestra lista de memoria
         for (shape in shapes) {
             shape.draw(this)
         }
         
-        // 3. Dibujamos la figura que estamos arrastrando actualmente (Efecto PREVIEW)
+        // 4. Dibujamos la figura que estamos arrastrando actualmente (Efecto PREVIEW)
         currentShape?.draw(this)
+
+        // 5. Dibujar caja de selección si hay una figura seleccionada
+        selectedShape?.let {
+            val b = it.getBounds()
+            drawDashedBox(b.x.toInt() - 2, b.y.toInt() - 2, (b.x + b.width).toInt() + 2, (b.y + b.height).toInt() + 2, Color.YELLOW)
+            // Si es bezier mostramos sus puntos y líneas guía
+            if (it is Bezier) {
+                val points = it.controlPoints
+                if (points.size > 1) {
+                    val lineColor = Color(0.5f, 0.5f, 0.0f) // Verde-amarillento para diferenciarla de la gris base
+                    for (i in 0 until points.size - 1) {
+                        drawLine(points[i].x.toInt(), points[i].y.toInt(), points[i+1].x.toInt(), points[i+1].y.toInt(), lineColor)
+                    }
+                }
+                for (p in points) {
+                    for (dx in -3..3) {
+                        for (dy in -3..3) {
+                            putPixel(p.x.toInt() + dx, p.y.toInt() + dy, Color.YELLOW)
+                        }
+                    }
+                }
+            }
+        }
+
+        // 6. Si showQuadTree está activo, dibujamos las fronteras
+        if (showQuadTree) {
+            quadTree.draw(this)
+        }
+    }
+
+    private fun drawLine(startX: Int, startY: Int, endX: Int, endY: Int, color: Color) {
+        var x = startX
+        var y = startY
+        val dx = kotlin.math.abs(endX - startX)
+        val dy = kotlin.math.abs(endY - startY)
+        val sx = if (startX < endX) 1 else -1
+        val sy = if (startY < endY) 1 else -1
+        var err = (if (dx > dy) dx else -dy) / 2
+
+        while (true) {
+            putPixel(x, y, color)
+            if (x == endX && y == endY) break
+            val e2 = err
+            if (e2 > -dx) { err -= dy; x += sx }
+            if (e2 < dy) { err += dx; y += sy }
+        }
+    }
+
+    private fun drawDashedBox(x0: Int, y0: Int, x1: Int, y1: Int, color: Color) {
+        // Linea superior
+        for (i in x0..x1 step 4) putPixel(i, y0, color)
+        // Linea inferior
+        for (i in x0..x1 step 4) putPixel(i, y1, color)
+        // Linea izquierda
+        for (i in y0..y1 step 4) putPixel(x0, i, color)
+        // Linea derecha
+        for (i in y0..y1 step 4) putPixel(x1, i, color)
     }
 
     private fun updateCurrentShape() {
@@ -162,15 +234,13 @@ class Proyecto1 : Engine2D() {
     override fun onKeyDown(key: KeyCode) {
         when (key) {
             KeyCode.SPACE -> {
-                shapes.clear()
-                currentShape = null
-                triangleStep = 0
+                clearCanvas()
+            }
+            KeyCode.S -> {
+                setToolSelect()
             }
             KeyCode.L -> {
-                currentTool = Tool.LINE
-                currentShape = null
-                updateActiveButtonUI()
-                println("Herramienta seleccionada: LÍNEA")
+                setToolLine()
             }
             KeyCode.R -> {
                 currentTool = Tool.RECTANGLE
@@ -197,10 +267,23 @@ class Proyecto1 : Engine2D() {
                 updateActiveButtonUI()
                 println("Herramienta seleccionada: BÉZIER")
             }
+            KeyCode.Q -> {
+                showQuadTree = !showQuadTree
+                println("QuadTree Visualización: ${if (showQuadTree) "ON" else "OFF"}")
+            }
             KeyCode.F -> {
                 isFilled = !isFilled
                 updateActiveButtonUI()
                 println("Modo Relleno alternado a: ${if (isFilled) "ACTIVADO" else "DESACTIVADO"}")
+            }
+            KeyCode.E -> {
+                val shape = selectedShape
+                if (shape is Bezier) {
+                    shape.elevateDegree()
+                    println("Grado de Curva de Bézier elevado! Total puntos de control: ${shape.controlPoints.size}")
+                } else {
+                    println("Acción inválida: Debe seleccionar una curva de Bézier para elevar su grado.")
+                }
             }
             KeyCode.CONTROL -> {
                 // Si pulsa Ctrl mientras dibuja, actualizamos la figura al instante
@@ -228,6 +311,30 @@ class Proyecto1 : Engine2D() {
             lastMouseX = x.toInt()
             lastMouseY = y.toInt()
             
+            if (currentTool == Tool.SELECT) {
+                // Primero verificamos si tocamos un punto de control de una Bézier ya seleccionada
+                val shape = selectedShape
+                if (shape is Bezier) {
+                    for (i in shape.controlPoints.indices) {
+                        val p = shape.controlPoints[i]
+                        // Damos un margen de clic (hitbox) de 10x10 pixeles (distancia de 5)
+                        if (kotlin.math.abs(p.x - x) <= 5 && kotlin.math.abs(p.y - y) <= 5) {
+                            selectedControlPointIndex = i
+                            println("Agarrando punto de control #$i de la curva")
+                            return
+                        }
+                    }
+                }
+
+                // Si no tocamos un punto, consultamos el QuadTree normal para seleccionar otra figura
+                val foundShapes = mutableListOf<Shape>()
+                quadTree.retrieve(x, y, foundShapes)
+                selectedShape = foundShapes.lastOrNull { it.getBounds().contains(x, y) }
+                selectedControlPointIndex = null
+                println(if (selectedShape != null) "Figura seleccionada!" else "Selección vacía")
+                return
+            }
+
             val fillCol = if (isFilled) {
                 Color(currentColor.r * 0.4f, currentColor.g * 0.4f, currentColor.b * 0.4f)
             } else {
@@ -238,7 +345,10 @@ class Proyecto1 : Engine2D() {
                 if (isDoubleClick && currentShape is Bezier) {
                     // Doble clic detectado: Finalizamos la curva de Bézier
                     updateCurrentShape()
-                    currentShape?.let { shapes.add(it) }
+                    currentShape?.let { 
+                        (it as Bezier).isFinalized = true
+                        shapes.add(it) 
+                    }
                     currentShape = null
                     isDrawing = false
                     println("Curva de Bézier terminada.")
@@ -282,6 +392,13 @@ class Proyecto1 : Engine2D() {
         if (button == MouseButton.PRIMARY) {
             lastMouseX = x.toInt()
             lastMouseY = y.toInt()
+
+            if (currentTool == Tool.SELECT) {
+                selectedControlPointIndex = null
+                isDrawing = false
+                return
+            }
+
             // Hacemos una última actualización
             updateCurrentShape()
 
@@ -312,6 +429,17 @@ class Proyecto1 : Engine2D() {
     override fun onMouseMove(x: Double, y: Double) {
         lastMouseX = x.toInt()
         lastMouseY = y.toInt()
+
+        if (isDrawing && currentTool == Tool.SELECT) {
+            val shape = selectedShape
+            val ptIndex = selectedControlPointIndex
+            if (shape is Bezier && ptIndex != null) {
+                shape.controlPoints[ptIndex].x = x
+                shape.controlPoints[ptIndex].y = y
+            }
+            return
+        }
+
         // Permitimos actualizar aunque isDrawing sea false para el preview dinámico del triángulo sin hacer clic
         if (isDrawing || currentShape != null) {
             updateCurrentShape()

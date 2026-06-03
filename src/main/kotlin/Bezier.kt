@@ -4,25 +4,29 @@ class Bezier(
     var controlPoints: MutableList<Point2D>,
     borderColor: Color
 ) : Shape(borderColor) {
+    
+    var isFinalized: Boolean = false
 
     override fun draw(engine: Engine2D) {
         if (controlPoints.isEmpty()) return
 
-        // Líneas guía entre puntos de control
-        if (controlPoints.size > 1) {
-            val polygonColor = Color(0.5f, 0.5f, 0.5f) 
-            for (i in 0 until controlPoints.size - 1) {
-                drawLine(engine, controlPoints[i].x.toInt(), controlPoints[i].y.toInt(), 
-                         controlPoints[i+1].x.toInt(), controlPoints[i+1].y.toInt(), polygonColor)
+        if (!isFinalized) {
+            // Líneas guía entre puntos de control
+            if (controlPoints.size > 1) {
+                val polygonColor = Color(0.5f, 0.5f, 0.5f) 
+                for (i in 0 until controlPoints.size - 1) {
+                    drawLine(engine, controlPoints[i].x.toInt(), controlPoints[i].y.toInt(), 
+                             controlPoints[i+1].x.toInt(), controlPoints[i+1].y.toInt(), polygonColor)
+                }
             }
-        }
 
-        // Puntos de control (son unos cuadraditos de 5x5)
-        val pointColor = Color(0.0f, 0.0f, 1.0f)
-        for (p in controlPoints) {
-            for (dx in -2..2) {
-                for (dy in -2..2) {
-                    engine.putPixel(p.x.toInt() + dx, p.y.toInt() + dy, pointColor)
+            // Puntos de control (son unos cuadraditos de 5x5)
+            val pointColor = Color(0.0f, 0.0f, 1.0f)
+            for (p in controlPoints) {
+                for (dx in -2..2) {
+                    for (dy in -2..2) {
+                        engine.putPixel(p.x.toInt() + dx, p.y.toInt() + dy, pointColor)
+                    }
                 }
             }
         }
@@ -97,5 +101,20 @@ class Bezier(
             if (e2 > -dx) { err -= dy; x += sx }
             if (e2 < dy) { err += dx; y += sy }
         }
+    }
+
+    override fun getBounds(): BoundingBox {
+        if (controlPoints.isEmpty()) return BoundingBox(0.0, 0.0, 0.0, 0.0)
+        var minX = controlPoints[0].x
+        var maxX = controlPoints[0].x
+        var minY = controlPoints[0].y
+        var maxY = controlPoints[0].y
+        for (p in controlPoints) {
+            if (p.x < minX) minX = p.x
+            if (p.x > maxX) maxX = p.x
+            if (p.y < minY) minY = p.y
+            if (p.y > maxY) maxY = p.y
+        }
+        return BoundingBox(minX, minY, maxX - minX, maxY - minY)
     }
 }
