@@ -117,4 +117,31 @@ class Bezier(
         }
         return BoundingBox(minX, minY, maxX - minX, maxY - minY)
     }
+
+    override fun getShapePoints(): List<Point2D> {
+        return controlPoints
+    }
+
+    override fun setControlPoint(index: Int, x: Double, y: Double) {
+        if (index in controlPoints.indices) {
+            controlPoints[index].x = x
+            controlPoints[index].y = y
+        }
+    }
+
+    override fun getCenter(): Point2D {
+        val bounds = getBounds()
+        return Point2D(bounds.x + bounds.width / 2.0, bounds.y + bounds.height / 2.0)
+    }
+
+    override fun translate(dx: Double, dy: Double) {
+        for (p in controlPoints) {
+            p.x += dx
+            p.y += dy
+        }
+    }
+
+    override fun setColor(newBorder: Color, newFill: Color?) {
+        borderColor = newBorder
+    }
 }

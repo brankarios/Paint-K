@@ -29,6 +29,41 @@ class Triangle(
         return BoundingBox(minX, minY, maxX - minX, maxY - minY)
     }
 
+    override fun getShapePoints(): List<Point2D> {
+        return listOf(
+            Point2D(x0.toDouble(), y0.toDouble()),
+            Point2D(x1.toDouble(), y1.toDouble()),
+            Point2D(x2.toDouble(), y2.toDouble())
+        )
+    }
+
+    override fun setControlPoint(index: Int, x: Double, y: Double) {
+        when (index) {
+            0 -> { x0 = x.toInt(); y0 = y.toInt() }
+            1 -> { x1 = x.toInt(); y1 = y.toInt() }
+            2 -> { x2 = x.toInt(); y2 = y.toInt() }
+        }
+    }
+
+    override fun getCenter(): Point2D {
+        // Baricentro del triángulo
+        return Point2D((x0 + x1 + x2) / 3.0, (y0 + y1 + y2) / 3.0)
+    }
+
+    override fun translate(dx: Double, dy: Double) {
+        x0 += dx.toInt()
+        y0 += dy.toInt()
+        x1 += dx.toInt()
+        y1 += dy.toInt()
+        x2 += dx.toInt()
+        y2 += dy.toInt()
+    }
+
+    override fun setColor(newBorder: Color, newFill: Color?) {
+        borderColor = newBorder
+        fillColor = newFill
+    }
+
     private fun fillScanLine(engine: Engine2D, color: Color) {
         var p0x = x0; var p0y = y0
         var p1x = x1; var p1y = y1

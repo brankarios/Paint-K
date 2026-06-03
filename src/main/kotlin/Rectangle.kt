@@ -47,4 +47,33 @@ class Rectangle(
         val maxY = kotlin.math.max(y0, y1).toDouble()
         return BoundingBox(minX, minY, maxX - minX, maxY - minY)
     }
+
+    override fun getShapePoints(): List<Point2D> {
+        // En un rectángulo usamos las 4 esquinas como puntos de control para mayor naturalidad, o solo 2 (opuestas).
+        // Vamos a usar 2 puntos (las esquinas definidoras x0,y0 y x1,y1) para mantenerlo simple.
+        return listOf(Point2D(x0.toDouble(), y0.toDouble()), Point2D(x1.toDouble(), y1.toDouble()))
+    }
+
+    override fun setControlPoint(index: Int, x: Double, y: Double) {
+        when (index) {
+            0 -> { x0 = x.toInt(); y0 = y.toInt() }
+            1 -> { x1 = x.toInt(); y1 = y.toInt() }
+        }
+    }
+
+    override fun getCenter(): Point2D {
+        return Point2D((x0 + x1) / 2.0, (y0 + y1) / 2.0)
+    }
+
+    override fun translate(dx: Double, dy: Double) {
+        x0 += dx.toInt()
+        y0 += dy.toInt()
+        x1 += dx.toInt()
+        y1 += dy.toInt()
+    }
+
+    override fun setColor(newBorder: Color, newFill: Color?) {
+        borderColor = newBorder
+        fillColor = newFill
+    }
 }

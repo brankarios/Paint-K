@@ -47,4 +47,16 @@
     <center>
         <ImageView fx:id="viewport" fitHeight="600.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
     </center>
+    <right>
+        <javafx.scene.layout.VBox fx:id="propertiesPanel" prefWidth="250.0" spacing="10.0" style="-fx-background-color: #2b2b2b; -fx-border-color: #3e3e3e; -fx-border-width: 0 0 0 1;" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <children>
+                <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Propiedades de Figura" />
+                <Label fx:id="lblNoSelection" style="-fx-text-fill: #aaaaaa;" text="Ninguna figura seleccionada" />
+                <javafx.scene.layout.VBox fx:id="pointsContainer" spacing="8.0" />
+            </children>
+        </javafx.scene.layout.VBox>
+    </right>
 </BorderPane>
