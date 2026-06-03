@@ -3,6 +3,8 @@ import javafx.scene.control.ColorPicker
 import javafx.scene.image.ImageView
 import javafx.scene.input.KeyCode
 import javafx.scene.input.MouseButton
+import javafx.stage.FileChooser
+import java.io.File
 
 enum class Tool {
     SELECT,
@@ -17,6 +19,7 @@ class Proyecto1 : Engine2D() {
 
     @FXML private lateinit var viewport: ImageView
     @FXML private lateinit var fxColorPicker: ColorPicker
+    @FXML private lateinit var fxBgColorPicker: ColorPicker
     @FXML private lateinit var btnSelect: javafx.scene.control.Button
     @FXML private lateinit var btnLine: javafx.scene.control.Button
     @FXML private lateinit var btnRectangle: javafx.scene.control.Button
@@ -30,7 +33,8 @@ class Proyecto1 : Engine2D() {
     @FXML private lateinit var pointsContainer: javafx.scene.layout.VBox
     
     // Variables de estado del Proyecto
-    private var currentColor = Color.RED
+    private var currentColor = Color.WHITE
+    private var backgroundColor = Color.BACKGROUND
     private var isDrawing = false
     private var currentTool = Tool.LINE 
     private var isFilled = false
@@ -41,6 +45,8 @@ class Proyecto1 : Engine2D() {
     private var quadTree: QuadTree = QuadTree(BoundingBox(0.0, 0.0, 1024.0, 600.0))
     
     private val shapes = mutableListOf<Shape>()
+    private val undoStack = mutableListOf<List<Shape>>()
+    private val redoStack = mutableListOf<List<Shape>>()
     
     // Variable temporal para guardar la figura que estamos trazando actualmente con el mouse
     private var currentShape: Shape? = null
@@ -59,17 +65,26 @@ class Proyecto1 : Engine2D() {
         bindEngine(viewport, 1024, 600)
         
         // Configuramos el selector de color para que cambie nuestro "currentColor" y el de la figura seleccionada
+        fxColorPicker.value = javafx.scene.paint.Color.WHITE
         fxColorPicker.setOnAction {
             val jfxColor = fxColorPicker.value
             val newCol = Color(jfxColor.red.toFloat(), jfxColor.green.toFloat(), jfxColor.blue.toFloat())
             currentColor = newCol
             selectedShape?.let {
+                saveState()
                 val fillCol = if (isFilled) Color(newCol.r * 0.4f, newCol.g * 0.4f, newCol.b * 0.4f) else null
                 it.setColor(newCol, fillCol)
+                updatePropertiesPanel()
             }
         }
+        
+        fxBgColorPicker.value = javafx.scene.paint.Color(0.1, 0.1, 0.15, 1.0)
+        
         updateActiveButtonUI()
         updatePropertiesPanel()
+        
+        // Guardamos el estado base inicial
+        saveState()
     }
 
     private fun updateActiveButtonUI() {
@@ -98,8 +113,108 @@ class Proyecto1 : Engine2D() {
     @FXML fun setToolCircle() { currentTool = Tool.CIRCLE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: Circulo") }
     @FXML fun setToolTriangle() { currentTool = Tool.TRIANGLE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: Triangulo") }
     @FXML fun setToolBezier() { currentTool = Tool.BEZIER; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: Bezier") }
-    @FXML fun toggleFill() { isFilled = !isFilled; updateActiveButtonUI(); println("Relleno: ${if(isFilled) "On" else "Off"}") }
-    @FXML fun clearCanvas() { shapes.clear(); currentShape = null; triangleStep = 0; selectedShape = null; updatePropertiesPanel(); println("Lienzo limpio") }
+    
+    @FXML fun toggleFill() { 
+        isFilled = !isFilled
+        updateActiveButtonUI()
+        selectedShape?.let {
+            saveState()
+            val fillCol = if (isFilled) Color(it.borderColor.r * 0.4f, it.borderColor.g * 0.4f, it.borderColor.b * 0.4f) else null
+            it.setColor(it.borderColor, fillCol)
+            updatePropertiesPanel()
+        }
+        println("Relleno: ${if(isFilled) "On" else "Off"}") 
+    }
+    
+    @FXML fun clearCanvas() { 
+        saveState()
+        shapes.clear()
+        currentShape = null
+        triangleStep = 0
+        selectedShape = null
+        updatePropertiesPanel()
+        println("Lienzo limpio") 
+    }
+
+    @FXML fun changeBackgroundColor() {
+        saveState()
+        val c = fxBgColorPicker.value
+        backgroundColor = Color(c.red.toFloat(), c.green.toFloat(), c.blue.toFloat())
+    }
+
+    private fun saveState() {
+        val cloneList = shapes.map { it.clone() }
+        undoStack.add(cloneList)
+        redoStack.clear()
+        if (undoStack.size > 50) undoStack.removeAt(0) // Limite de historial de 50 acciones
+    }
+
+    @FXML fun undo() {
+        if (undoStack.isNotEmpty()) {
+            redoStack.add(shapes.map { it.clone() })
+            val previousState = undoStack.removeLast()
+            shapes.clear()
+            shapes.addAll(previousState)
+            selectedShape = null
+            updatePropertiesPanel()
+        }
+    }
+
+    @FXML fun redo() {
+        if (redoStack.isNotEmpty()) {
+            undoStack.add(shapes.map { it.clone() })
+            val nextState = redoStack.removeLast()
+            shapes.clear()
+            shapes.addAll(nextState)
+            selectedShape = null
+            updatePropertiesPanel()
+        }
+    }
+
+    @FXML fun saveCanvas() {
+        val fileChooser = FileChooser()
+        fileChooser.title = "Guardar Lienzo"
+        fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("Archivos Paint", "*.paint"))
+        val file = fileChooser.showSaveDialog(null)
+        if (file != null) {
+            val sb = java.lang.StringBuilder()
+            sb.appendLine("BG;${backgroundColor.serialize()}")
+            for (s in shapes) {
+                sb.appendLine(s.serialize())
+            }
+            file.writeText(sb.toString())
+            println("Guardado")
+        }
+    }
+
+    @FXML fun loadCanvas() {
+        val fileChooser = FileChooser()
+        fileChooser.title = "Cargar Lienzo"
+        fileChooser.extensionFilters.add(FileChooser.ExtensionFilter("Archivos Paint", "*.paint"))
+        val file = fileChooser.showOpenDialog(null)
+        if (file != null) {
+            saveState()
+            shapes.clear()
+            selectedShape = null
+            currentShape = null
+            try {
+                file.readLines().forEach { line ->
+                    if (line.startsWith("BG;")) {
+                        val parts = line.split(";")
+                        backgroundColor = Color.deserialize(parts[1])
+                        fxBgColorPicker.value = javafx.scene.paint.Color(backgroundColor.r.toDouble(), backgroundColor.g.toDouble(), backgroundColor.b.toDouble(), 1.0)
+                    } else {
+                        val parsedShape = ShapeFactory.deserialize(line)
+                        if (parsedShape != null) shapes.add(parsedShape)
+                    }
+                }
+                updatePropertiesPanel()
+                println("Cargado")
+            } catch (e: Exception) {
+                println("Error al cargar")
+            }
+        }
+    }
 
     private fun updatePropertiesPanel() {
         if (!::propertiesPanel.isInitialized) return
@@ -133,6 +248,7 @@ class Proyecto1 : Engine2D() {
                 try {
                     val nx = txtX.text.toDouble()
                     val ny = txtY.text.toDouble()
+                    saveState()
                     shape.setControlPoint(i, nx, ny)
                 } catch (e: Exception) {}
             }
@@ -149,8 +265,8 @@ class Proyecto1 : Engine2D() {
 
     // Este método es el Bucle de Juego (Game Loop), corre automáticamente 60 veces por segundo
     override fun update(deltaTime: Float) {
-        // 1. Limpiamos toda la pantalla pintándola de negro
-        clear(Color.BACKGROUND)
+        // 1. Limpiamos toda la pantalla pintándola con el color de fondo dinámico
+        clear(backgroundColor)
         
         // 2. Reconstruimos el QuadTree para el estado actual de las figuras
         quadTree.clear()
@@ -304,7 +420,7 @@ class Proyecto1 : Engine2D() {
                 clearCanvas()
             }
             KeyCode.S -> {
-                setToolSelect()
+                if (isKeyPressed(KeyCode.CONTROL)) saveCanvas() else setToolSelect()
             }
             KeyCode.L -> {
                 setToolLine()
@@ -355,12 +471,16 @@ class Proyecto1 : Engine2D() {
             }
             KeyCode.DELETE -> {
                 if (selectedShape != null) {
+                    saveState()
                     shapes.remove(selectedShape)
                     selectedShape = null
                     updatePropertiesPanel()
                     println("Figura borrada")
                 }
             }
+            KeyCode.Z -> if (isKeyPressed(KeyCode.CONTROL)) undo()
+            KeyCode.Y -> if (isKeyPressed(KeyCode.CONTROL)) redo()
+            KeyCode.O -> if (isKeyPressed(KeyCode.CONTROL)) loadCanvas()
             KeyCode.CONTROL -> {
                 // Si pulsa Ctrl mientras dibuja, actualizamos la figura al instante
                 if (isDrawing || currentShape != null) updateCurrentShape()
@@ -431,6 +551,7 @@ class Proyecto1 : Engine2D() {
                     updateCurrentShape()
                     currentShape?.let { 
                         (it as Bezier).isFinalized = true
+                        saveState()
                         shapes.add(it) 
                     }
                     currentShape = null
@@ -455,6 +576,7 @@ class Proyecto1 : Engine2D() {
                 } else if (triangleStep == 2) {
                     // Tercer punto fijado, terminamos
                     updateCurrentShape()
+                    saveState()
                     currentShape?.let { shapes.add(it) }
                     currentShape = null
                     triangleStep = 0
@@ -478,6 +600,9 @@ class Proyecto1 : Engine2D() {
             lastMouseY = y.toInt()
 
             if (currentTool == Tool.SELECT) {
+                if (selectedShape != null && selectedControlPointIndex != null) {
+                    saveState()
+                }
                 selectedControlPointIndex = null
                 isDrawing = false
                 updatePropertiesPanel()
@@ -488,7 +613,10 @@ class Proyecto1 : Engine2D() {
             updateCurrentShape()
 
             if (currentTool != Tool.TRIANGLE && currentTool != Tool.BEZIER) {
-                currentShape?.let { shapes.add(it) }
+                if (isDrawing && currentShape != null) {
+                    saveState()
+                    shapes.add(currentShape!!)
+                }
                 currentShape = null
                 isDrawing = false
             } else if (currentTool == Tool.TRIANGLE) {

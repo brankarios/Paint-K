@@ -76,4 +76,16 @@ class Rectangle(
         borderColor = newBorder
         fillColor = newFill
     }
+
+    override fun clone(): Shape {
+        val fCol = if (fillColor != null) Color(fillColor!!.r, fillColor!!.g, fillColor!!.b) else null
+        return Rectangle(x0, y0, x1, y1, Color(borderColor.r, borderColor.g, borderColor.b), fCol).also {
+            it.zIndex = this.zIndex
+        }
+    }
+
+    override fun serialize(): String {
+        val fStr = if (fillColor != null) fillColor!!.serialize() else "null"
+        return "RECTANGLE;$x0;$y0;$x1;$y1;${borderColor.serialize()};$fStr"
+    }
 }

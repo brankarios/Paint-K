@@ -27,4 +27,10 @@ abstract class Shape(var borderColor: Color, var zIndex: Int = 0) {
     
     // Cambia el color de borde (y relleno si la figura lo soporta)
     abstract fun setColor(newBorder: Color, newFill: Color? = null)
+    
+    // Devuelve una copia independiente (Deep Copy) de la figura para el historial
+    abstract fun clone(): Shape
+    
+    // Devuelve una representación en texto plano de la figura para guardado
+    abstract fun serialize(): String
 }

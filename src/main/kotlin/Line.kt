@@ -77,4 +77,14 @@ class Line(var x0: Int, var y0: Int, var x1: Int, var y1: Int, borderColor: Colo
     override fun setColor(newBorder: Color, newFill: Color?) {
         borderColor = newBorder
     }
+
+    override fun clone(): Shape {
+        return Line(x0, y0, x1, y1, Color(borderColor.r, borderColor.g, borderColor.b)).also {
+            it.zIndex = this.zIndex
+        }
+    }
+
+    override fun serialize(): String {
+        return "LINE;$x0;$y0;$x1;$y1;${borderColor.serialize()}"
+    }
 }

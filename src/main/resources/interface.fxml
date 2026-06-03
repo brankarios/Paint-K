@@ -13,36 +13,59 @@
 
 <BorderPane prefHeight="660.0" prefWidth="1024.0" style="-fx-background-color: #1e1e1e;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Proyecto1">
     <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="60.0" spacing="10.0" style="-fx-background-color: #2b2b2b; -fx-border-color: #3e3e3e; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
-            <padding>
-                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
-            </padding>
-            <children>
-                <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Herramientas:" />
-                
-                <Button fx:id="btnSelect" mnemonicParsing="false" onAction="#setToolSelect" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Seleccionar (S)" />
-                <Button fx:id="btnLine" mnemonicParsing="false" onAction="#setToolLine" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Línea" />
-                <Button fx:id="btnRectangle" mnemonicParsing="false" onAction="#setToolRectangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Rectángulo" />
-                <Button fx:id="btnCircle" mnemonicParsing="false" onAction="#setToolCircle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Círculo" />
-                <Button fx:id="btnTriangle" mnemonicParsing="false" onAction="#setToolTriangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Triángulo" />
-                <Button fx:id="btnBezier" mnemonicParsing="false" onAction="#setToolBezier" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Curvas" />
-                
-                <Separator orientation="VERTICAL" prefHeight="200.0" />
-                
-                <Label style="-fx-text-fill: #aaaaaa;" text="Color:" />
-                <ColorPicker fx:id="fxColorPicker" prefWidth="100.0">
-                    <value>
-                        <Color red="1.0" />
-                    </value>
-                </ColorPicker>
-
-                <Button fx:id="btnFill" mnemonicParsing="false" onAction="#toggleFill" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Relleno (F)" />
-                
-                <Region HBox.hgrow="ALWAYS" />
-                
-                <Button mnemonicParsing="false" onAction="#clearCanvas" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Limpiar (Espacio)" />
-            </children>
-        </HBox>
+        <javafx.scene.layout.VBox style="-fx-background-color: #2b2b2b; -fx-border-color: #3e3e3e; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
+            <!-- Fila 1: Archivo y Edición -->
+            <HBox alignment="CENTER_LEFT" prefHeight="40.0" spacing="10.0">
+                <padding>
+                    <Insets bottom="5.0" left="20.0" right="20.0" top="10.0" />
+                </padding>
+                <children>
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 13px;" text="Archivo:" />
+                    <Button mnemonicParsing="false" onAction="#saveCanvas" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Guardar (Ctrl+S)" />
+                    <Button mnemonicParsing="false" onAction="#loadCanvas" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Cargar (Ctrl+O)" />
+                    
+                    <Separator orientation="VERTICAL" prefHeight="20.0" />
+                    
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 13px;" text="Edición:" />
+                    <Button mnemonicParsing="false" onAction="#undo" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Deshacer (Ctrl+Z)" />
+                    <Button mnemonicParsing="false" onAction="#redo" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Rehacer (Ctrl+Y)" />
+                    
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Button mnemonicParsing="false" onAction="#clearCanvas" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Limpiar (Espacio)" />
+                </children>
+            </HBox>
+            
+            <!-- Fila 2: Herramientas -->
+            <HBox alignment="CENTER_LEFT" prefHeight="50.0" spacing="10.0">
+                <padding>
+                    <Insets bottom="10.0" left="20.0" right="20.0" top="5.0" />
+                </padding>
+                <children>
+                    <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 13px;" text="Herramientas:" />
+                    <Button fx:id="btnSelect" mnemonicParsing="false" onAction="#setToolSelect" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Seleccionar (S)" />
+                    <Button fx:id="btnLine" mnemonicParsing="false" onAction="#setToolLine" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Línea" />
+                    <Button fx:id="btnRectangle" mnemonicParsing="false" onAction="#setToolRectangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Rectángulo" />
+                    <Button fx:id="btnCircle" mnemonicParsing="false" onAction="#setToolCircle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Círculo" />
+                    <Button fx:id="btnTriangle" mnemonicParsing="false" onAction="#setToolTriangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Triángulo" />
+                    <Button fx:id="btnBezier" mnemonicParsing="false" onAction="#setToolBezier" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Curvas" />
+                    
+                    <Separator orientation="VERTICAL" prefHeight="20.0" />
+                    
+                    <Label style="-fx-text-fill: #aaaaaa;" text="Color:" />
+                    <ColorPicker fx:id="fxColorPicker" prefWidth="90.0">
+                        <value><Color red="1.0" /></value>
+                    </ColorPicker>
+                    <Button fx:id="btnFill" mnemonicParsing="false" onAction="#toggleFill" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Relleno (F)" />
+                    
+                    <Separator orientation="VERTICAL" prefHeight="20.0" />
+                    
+                    <Label style="-fx-text-fill: #aaaaaa;" text="Fondo:" />
+                    <ColorPicker fx:id="fxBgColorPicker" onAction="#changeBackgroundColor" prefWidth="90.0">
+                        <value><Color red="0.1" green="0.1" blue="0.15" /></value>
+                    </ColorPicker>
+                </children>
+            </HBox>
+        </javafx.scene.layout.VBox>
     </top>
     <center>
         <ImageView fx:id="viewport" fitHeight="600.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />

@@ -114,6 +114,18 @@ class Circle(
         fillColor = newFill
     }
 
+    override fun clone(): Shape {
+        val fCol = if (fillColor != null) Color(fillColor!!.r, fillColor!!.g, fillColor!!.b) else null
+        return Circle(x0, y0, x1, y1, Color(borderColor.r, borderColor.g, borderColor.b), fCol).also {
+            it.zIndex = this.zIndex
+        }
+    }
+
+    override fun serialize(): String {
+        val fStr = if (fillColor != null) fillColor!!.serialize() else "null"
+        return "CIRCLE;$x0;$y0;$x1;$y1;${borderColor.serialize()};$fStr"
+    }
+
     private fun drawEllipsePoints(engine: Engine2D, cx: Int, cy: Int, x: Int, y: Int) {
         if (fillColor != null) {
             val fillCol = fillColor!!

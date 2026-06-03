@@ -64,6 +64,18 @@ class Triangle(
         fillColor = newFill
     }
 
+    override fun clone(): Shape {
+        val fCol = if (fillColor != null) Color(fillColor!!.r, fillColor!!.g, fillColor!!.b) else null
+        return Triangle(x0, y0, x1, y1, x2, y2, Color(borderColor.r, borderColor.g, borderColor.b), fCol).also {
+            it.zIndex = this.zIndex
+        }
+    }
+
+    override fun serialize(): String {
+        val fStr = if (fillColor != null) fillColor!!.serialize() else "null"
+        return "TRIANGLE;$x0;$y0;$x1;$y1;$x2;$y2;${borderColor.serialize()};$fStr"
+    }
+
     private fun fillScanLine(engine: Engine2D, color: Color) {
         var p0x = x0; var p0y = y0
         var p1x = x1; var p1y = y1

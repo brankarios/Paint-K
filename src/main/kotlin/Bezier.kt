@@ -144,4 +144,20 @@ class Bezier(
     override fun setColor(newBorder: Color, newFill: Color?) {
         borderColor = newBorder
     }
+
+    override fun clone(): Shape {
+        val newPoints = mutableListOf<Point2D>()
+        for (p in controlPoints) {
+            newPoints.add(Point2D(p.x, p.y))
+        }
+        val b = Bezier(newPoints, Color(borderColor.r, borderColor.g, borderColor.b))
+        b.isFinalized = this.isFinalized
+        b.zIndex = this.zIndex
+        return b
+    }
+
+    override fun serialize(): String {
+        val pts = controlPoints.joinToString(",") { "${it.x}|${it.y}" }
+        return "BEZIER;$pts;${borderColor.serialize()};$isFinalized"
+    }
 }
