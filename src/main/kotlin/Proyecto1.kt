@@ -41,6 +41,7 @@ class Proyecto1 : Engine2D() {
     private var isFilled = false
     private var clipboardShape: Shape? = null
     private var showQuadTree = false
+    private var hoveredShape: Shape? = null
 
     // Estados para historial
     private var selectedShape: Shape? = null
@@ -338,11 +339,19 @@ class Proyecto1 : Engine2D() {
         for (shape in shapes) {
             shape.draw(this)
         }
-        
-        // 4. Dibujamos la figura que estamos arrastrando actualmente (Efecto PREVIEW)
-        currentShape?.draw(this)
 
-        // 5. Dibujar caja de selección si hay una figura seleccionada
+        // 4. Dibujar Hover Bounding Box
+        if (currentTool == Tool.SELECT && !isDrawing) {
+            hoveredShape?.let {
+                val b = it.getBounds()
+                drawDashedBox(b.x.toInt(), b.y.toInt(), (b.x + b.width).toInt(), (b.y + b.height).toInt(), Color(1.0f, 1.0f, 1.0f))
+            }
+        }
+
+        // 5. Dibujamos la figura que estamos arrastrando actualmente (Efecto PREVIEW)
+        currentShape?.draw(this)
+        
+        // 6. Dibujar caja de selección si hay una figura seleccionada
         selectedShape?.let {
             val b = it.getBounds()
             drawDashedBox(b.x.toInt() - 2, b.y.toInt() - 2, (b.x + b.width).toInt() + 2, (b.y + b.height).toInt() + 2, Color.YELLOW)
@@ -712,6 +721,14 @@ class Proyecto1 : Engine2D() {
                 }
             }
             return
+        }
+
+        if (!isDrawing && currentTool == Tool.SELECT) {
+            val foundShapes = mutableListOf<Shape>()
+            quadTree.retrieve(x, y, foundShapes)
+            hoveredShape = foundShapes.lastOrNull { it.getBounds().contains(x, y) }
+        } else {
+            hoveredShape = null
         }
 
         // Permitimos actualizar aunque isDrawing sea false para el preview dinámico del triángulo sin hacer clic

@@ -5,33 +5,44 @@
 <?import javafx.scene.control.ColorPicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.layout.Region?>
 
-<BorderPane prefHeight="660.0" prefWidth="1024.0" style="-fx-background-color: #1e1e1e;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Proyecto1">
+<BorderPane prefHeight="660.0" prefWidth="1024.0" styleClass="root" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Proyecto1">
     <top>
-        <javafx.scene.layout.VBox style="-fx-background-color: #2b2b2b; -fx-border-color: #3e3e3e; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
+        <javafx.scene.layout.VBox styleClass="panel-lateral" BorderPane.alignment="CENTER">
             <!-- Fila 1: Archivo y Edición -->
             <HBox alignment="CENTER_LEFT" prefHeight="40.0" spacing="10.0">
                 <padding>
                     <Insets bottom="5.0" left="20.0" right="20.0" top="10.0" />
                 </padding>
                 <children>
-                    <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 13px;" text="Archivo:" />
-                    <Button mnemonicParsing="false" onAction="#saveCanvas" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Guardar (Ctrl+S)" />
-                    <Button mnemonicParsing="false" onAction="#loadCanvas" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Cargar (Ctrl+O)" />
+                    <Label styleClass="etiqueta-titulo" text="Archivo:" />
+                    <Button mnemonicParsing="false" onAction="#saveCanvas" text="💾">
+                        <tooltip><Tooltip text="Guardar (Ctrl+S)"/></tooltip>
+                    </Button>
+                    <Button mnemonicParsing="false" onAction="#loadCanvas" text="📂">
+                        <tooltip><Tooltip text="Cargar (Ctrl+O)"/></tooltip>
+                    </Button>
                     
                     <Separator orientation="VERTICAL" prefHeight="20.0" />
                     
-                    <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 13px;" text="Edición:" />
-                    <Button mnemonicParsing="false" onAction="#undo" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Deshacer (Ctrl+Z)" />
-                    <Button mnemonicParsing="false" onAction="#redo" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Rehacer (Ctrl+Y)" />
+                    <Label styleClass="etiqueta-titulo" text="Edición:" />
+                    <Button mnemonicParsing="false" onAction="#undo" text="↩">
+                        <tooltip><Tooltip text="Deshacer (Ctrl+Z)"/></tooltip>
+                    </Button>
+                    <Button mnemonicParsing="false" onAction="#redo" text="↪">
+                        <tooltip><Tooltip text="Rehacer (Ctrl+Y)"/></tooltip>
+                    </Button>
                     
                     <Region HBox.hgrow="ALWAYS" />
-                    <Button mnemonicParsing="false" onAction="#clearCanvas" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Limpiar (Espacio)" />
+                    <Button mnemonicParsing="false" onAction="#clearCanvas" style="-fx-background-color: #e74c3c; -fx-border-color: #e74c3c;" text="🗑">
+                        <tooltip><Tooltip text="Limpiar (Espacio)"/></tooltip>
+                    </Button>
                 </children>
             </HBox>
             
@@ -41,29 +52,41 @@
                     <Insets bottom="10.0" left="20.0" right="20.0" top="5.0" />
                 </padding>
                 <children>
-                    <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 13px;" text="Herramientas:" />
-                    <Button fx:id="btnSelect" mnemonicParsing="false" onAction="#setToolSelect" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Seleccionar (S)" />
-                    <Button fx:id="btnLine" mnemonicParsing="false" onAction="#setToolLine" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Línea" />
-                    <Button fx:id="btnRectangle" mnemonicParsing="false" onAction="#setToolRectangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Rectángulo" />
-                    <Button fx:id="btnCircle" mnemonicParsing="false" onAction="#setToolCircle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Círculo" />
-                    <Button fx:id="btnTriangle" mnemonicParsing="false" onAction="#setToolTriangle" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Triángulo" />
-                    <Button fx:id="btnBezier" mnemonicParsing="false" onAction="#setToolBezier" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Curvas" />
+                    <Label styleClass="etiqueta-titulo" text="Herramientas:" />
+                    <Button fx:id="btnSelect" mnemonicParsing="false" onAction="#setToolSelect" text="🖱">
+                        <tooltip><Tooltip text="Seleccionar (S)"/></tooltip>
+                    </Button>
+                    <Button fx:id="btnLine" mnemonicParsing="false" onAction="#setToolLine" text="╱">
+                        <tooltip><Tooltip text="Línea (L)"/></tooltip>
+                    </Button>
+                    <Button fx:id="btnRectangle" mnemonicParsing="false" onAction="#setToolRectangle" text="▭">
+                        <tooltip><Tooltip text="Rectángulo (R)"/></tooltip>
+                    </Button>
+                    <Button fx:id="btnCircle" mnemonicParsing="false" onAction="#setToolCircle" text="◯">
+                        <tooltip><Tooltip text="Círculo (C)"/></tooltip>
+                    </Button>
+                    <Button fx:id="btnTriangle" mnemonicParsing="false" onAction="#setToolTriangle" text="△">
+                        <tooltip><Tooltip text="Triángulo (T)"/></tooltip>
+                    </Button>
+                    <Button fx:id="btnBezier" mnemonicParsing="false" onAction="#setToolBezier" text="〰">
+                        <tooltip><Tooltip text="Curvas de Bézier (B)"/></tooltip>
+                    </Button>
                     
                     <Separator orientation="VERTICAL" prefHeight="20.0" />
                     
-                    <Label style="-fx-text-fill: #aaaaaa;" text="Color:" />
-                    <ColorPicker fx:id="fxColorPicker" prefWidth="90.0">
+                    <Label styleClass="etiqueta-secundaria" text="Color:" />
+                    <ColorPicker fx:id="fxColorPicker" prefWidth="90.0" styleClass="color-picker">
                         <value><Color red="1.0" /></value>
                     </ColorPicker>
-                    <Button fx:id="btnFill" mnemonicParsing="false" onAction="#toggleFill" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Relleno (F)" />
+                    <Button fx:id="btnFill" mnemonicParsing="false" onAction="#toggleFill" text="Relleno (F)" />
                     
                     <Separator orientation="VERTICAL" prefHeight="20.0" />
-                    <javafx.scene.control.CheckBox fx:id="fxAntialiasing" mnemonicParsing="false" onAction="#toggleAntialiasing" style="-fx-text-fill: white; -fx-font-weight: bold;" text="Suavizado (Wu)" />
+                    <javafx.scene.control.CheckBox fx:id="fxAntialiasing" mnemonicParsing="false" onAction="#toggleAntialiasing" text="Suavizado (Wu)" />
 
                     <Separator orientation="VERTICAL" prefHeight="20.0" />
                     
-                    <Label style="-fx-text-fill: #aaaaaa;" text="Fondo:" />
-                    <ColorPicker fx:id="fxBgColorPicker" onAction="#changeBackgroundColor" prefWidth="90.0">
+                    <Label styleClass="etiqueta-secundaria" text="Fondo:" />
+                    <ColorPicker fx:id="fxBgColorPicker" onAction="#changeBackgroundColor" prefWidth="90.0" styleClass="color-picker">
                         <value><Color red="0.1" green="0.1" blue="0.15" /></value>
                     </ColorPicker>
                 </children>
@@ -74,28 +97,34 @@
         <ImageView fx:id="viewport" fitHeight="600.0" fitWidth="1024.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
     </center>
     <right>
-        <javafx.scene.layout.VBox fx:id="propertiesPanel" prefWidth="250.0" spacing="10.0" style="-fx-background-color: #2b2b2b; -fx-border-color: #3e3e3e; -fx-border-width: 0 0 0 1;" BorderPane.alignment="CENTER">
+        <javafx.scene.layout.VBox fx:id="propertiesPanel" prefWidth="250.0" spacing="10.0" styleClass="panel-lateral, panel-derecho" BorderPane.alignment="CENTER">
             <padding>
                 <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
             </padding>
             <children>
-                <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Propiedades de Figura" />
-                <Label fx:id="lblNoSelection" style="-fx-text-fill: #aaaaaa;" text="Ninguna figura seleccionada" />
+                <Label styleClass="etiqueta-titulo" text="Propiedades de Figura" />
+                <Label fx:id="lblNoSelection" styleClass="etiqueta-secundaria" text="Ninguna figura seleccionada" />
                 <javafx.scene.layout.VBox fx:id="pointsContainer" spacing="8.0" />
                 
                 <Separator prefWidth="200.0" />
-                <Label style="-fx-font-weight: bold; -fx-text-fill: white;" text="Escala (Zoom)" />
+                <Label styleClass="etiqueta-titulo" text="Escala (Zoom)" />
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <Button mnemonicParsing="false" onAction="#scaleSelectedDown" prefWidth="35.0" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;" text="-" />
-                    <Button mnemonicParsing="false" onAction="#scaleSelectedUp" prefWidth="35.0" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;" text="+" />
+                    <Button mnemonicParsing="false" onAction="#scaleSelectedDown" prefWidth="35.0" style="-fx-font-weight: bold;" text="-" />
+                    <Button mnemonicParsing="false" onAction="#scaleSelectedUp" prefWidth="35.0" style="-fx-font-weight: bold;" text="+" />
                 </HBox>
                 
                 <Separator prefWidth="200.0" />
-                <Label style="-fx-font-weight: bold; -fx-text-fill: white;" text="Portapapeles" />
+                <Label styleClass="etiqueta-titulo" text="Portapapeles" />
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <Button mnemonicParsing="false" onAction="#copySelected" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Copiar" />
-                    <Button mnemonicParsing="false" onAction="#cutSelected" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Cortar" />
-                    <Button mnemonicParsing="false" onAction="#pasteClipboard" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Pegar" />
+                    <Button mnemonicParsing="false" onAction="#copySelected" text="📋">
+                        <tooltip><Tooltip text="Copiar (Ctrl+C)"/></tooltip>
+                    </Button>
+                    <Button mnemonicParsing="false" onAction="#cutSelected" text="✂">
+                        <tooltip><Tooltip text="Cortar (Ctrl+X)"/></tooltip>
+                    </Button>
+                    <Button mnemonicParsing="false" onAction="#pasteClipboard" text="📝">
+                        <tooltip><Tooltip text="Pegar (Ctrl+V)"/></tooltip>
+                    </Button>
                 </HBox>
             </children>
         </javafx.scene.layout.VBox>

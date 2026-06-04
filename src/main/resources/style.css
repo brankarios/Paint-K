@@ -1,0 +1,108 @@
+/* 
+   style.css 
+   Tema Dark Mode Premium para Paint-K
+*/
+
+/* Base general */
+.root {
+    -fx-background-color: #121212;
+    -fx-font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+/* Paneles laterales */
+.panel-lateral {
+    -fx-background-color: #1e1e1e;
+    -fx-border-color: #333333;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 0);
+}
+.panel-izquierdo {
+    -fx-border-width: 0 1 0 0;
+}
+.panel-derecho {
+    -fx-border-width: 0 0 0 1;
+}
+
+/* Textos y Etiquetas */
+.etiqueta-titulo {
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+    -fx-padding: 0 0 5 0;
+}
+.etiqueta-secundaria {
+    -fx-text-fill: #a0a0a0;
+    -fx-font-size: 13px;
+}
+
+/* Botones regulares */
+.button {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #3e3e3e;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 6 12 6 12;
+    -fx-cursor: hand;
+    -fx-font-size: 13px;
+    -fx-transition: -fx-background-color 0.2s, -fx-border-color 0.2s;
+}
+
+.button:hover {
+    -fx-background-color: #3a3a3a;
+    -fx-border-color: #4e4e4e;
+}
+
+.button:pressed {
+    -fx-background-color: #00adb5;
+    -fx-border-color: #00adb5;
+}
+
+/* Radio Buttons y Checkboxes (Herramientas) */
+.radio-button, .check-box {
+    -fx-text-fill: #d0d0d0;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+    -fx-padding: 4 0 4 0;
+}
+
+.radio-button:hover, .check-box:hover {
+    -fx-text-fill: #ffffff;
+}
+
+.radio-button:selected, .check-box:selected {
+    -fx-text-fill: #00adb5; /* Acento Azul Neón/Cyan */
+    -fx-font-weight: bold;
+}
+
+/* Separadores */
+.separator *.line {
+    -fx-border-color: #333333;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* Inputs de Texto */
+.text-field {
+    -fx-background-color: #2a2a2a;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #3e3e3e;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 4;
+}
+
+.text-field:focused {
+    -fx-border-color: #00adb5;
+}
+
+/* Color Picker */
+.color-picker {
+    -fx-background-color: #2a2a2a;
+    -fx-color-label-visible: false;
+    -fx-border-color: #3e3e3e;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-cursor: hand;
+}
+.color-picker:hover {
+    -fx-background-color: #3a3a3a;
+}
