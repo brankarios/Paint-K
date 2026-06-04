@@ -58,6 +58,9 @@
                     <Button fx:id="btnFill" mnemonicParsing="false" onAction="#toggleFill" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand;" text="Relleno (F)" />
                     
                     <Separator orientation="VERTICAL" prefHeight="20.0" />
+                    <javafx.scene.control.CheckBox fx:id="fxAntialiasing" mnemonicParsing="false" onAction="#toggleAntialiasing" style="-fx-text-fill: white; -fx-font-weight: bold;" text="Suavizado (Wu)" />
+
+                    <Separator orientation="VERTICAL" prefHeight="20.0" />
                     
                     <Label style="-fx-text-fill: #aaaaaa;" text="Fondo:" />
                     <ColorPicker fx:id="fxBgColorPicker" onAction="#changeBackgroundColor" prefWidth="90.0">

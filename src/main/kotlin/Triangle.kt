@@ -16,9 +16,9 @@ class Triangle(
             fillScanLine(engine, fillColor!!)
         }
 
-        drawLine(engine, x0, y0, x1, y1)
-        drawLine(engine, x1, y1, x2, y2)
-        drawLine(engine, x2, y2, x0, y0)
+        engine.drawLine(x0, y0, x1, y1, borderColor)
+        engine.drawLine(x1, y1, x2, y2, borderColor)
+        engine.drawLine(x2, y2, x0, y0, borderColor)
     }
 
     override fun getBounds(): BoundingBox {
@@ -150,21 +150,5 @@ class Triangle(
         }
     }
 
-    private fun drawLine(engine: Engine2D, startX: Int, startY: Int, endX: Int, endY: Int) {
-        var x = startX
-        var y = startY
-        val dx = abs(endX - startX)
-        val dy = abs(endY - startY)
-        val sx = if (startX < endX) 1 else -1
-        val sy = if (startY < endY) 1 else -1
-        var err = (if (dx > dy) dx else -dy) / 2
 
-        while (true) {
-            engine.putPixel(x, y, borderColor)
-            if (x == endX && y == endY) break
-            val e2 = err
-            if (e2 > -dx) { err -= dy; x += sx }
-            if (e2 < dy) { err += dx; y += sy }
-        }
-    }
 }

@@ -20,6 +20,7 @@ class Proyecto1 : Engine2D() {
     @FXML private lateinit var viewport: ImageView
     @FXML private lateinit var fxColorPicker: ColorPicker
     @FXML private lateinit var fxBgColorPicker: ColorPicker
+    @FXML private lateinit var fxAntialiasing: javafx.scene.control.CheckBox
     @FXML private lateinit var btnSelect: javafx.scene.control.Button
     @FXML private lateinit var btnLine: javafx.scene.control.Button
     @FXML private lateinit var btnRectangle: javafx.scene.control.Button
@@ -114,6 +115,12 @@ class Proyecto1 : Engine2D() {
     @FXML fun setToolTriangle() { currentTool = Tool.TRIANGLE; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: Triangulo") }
     @FXML fun setToolBezier() { currentTool = Tool.BEZIER; currentShape = null; triangleStep = 0; updateActiveButtonUI(); println("Herramienta: Bezier") }
     
+    @FXML fun toggleAntialiasing() {
+        saveState()
+        isAntialiasingEnabled = fxAntialiasing.isSelected
+        println("Antialiasing: ${if (isAntialiasingEnabled) "Wu" else "Bresenham"}")
+    }
+
     @FXML fun toggleFill() { 
         isFilled = !isFilled
         updateActiveButtonUI()
@@ -323,23 +330,6 @@ class Proyecto1 : Engine2D() {
         }
     }
 
-    private fun drawLine(startX: Int, startY: Int, endX: Int, endY: Int, color: Color) {
-        var x = startX
-        var y = startY
-        val dx = kotlin.math.abs(endX - startX)
-        val dy = kotlin.math.abs(endY - startY)
-        val sx = if (startX < endX) 1 else -1
-        val sy = if (startY < endY) 1 else -1
-        var err = (if (dx > dy) dx else -dy) / 2
-
-        while (true) {
-            putPixel(x, y, color)
-            if (x == endX && y == endY) break
-            val e2 = err
-            if (e2 > -dx) { err -= dy; x += sx }
-            if (e2 < dy) { err += dx; y += sy }
-        }
-    }
 
     private fun drawDashedBox(x0: Int, y0: Int, x1: Int, y1: Int, color: Color) {
         // Linea superior

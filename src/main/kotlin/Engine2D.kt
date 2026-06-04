@@ -33,6 +33,8 @@ abstract class Engine2D {
     private val activeKeys = mutableSetOf<KeyCode>()
     private val activeButtons = mutableSetOf<MouseButton>()
 
+    var isAntialiasingEnabled = false
+
     fun bindEngine(viewport: ImageView, canvasWidth: Int, canvasHeight: Int) {
         this.width = canvasWidth
         this.height = canvasHeight
@@ -77,12 +79,84 @@ abstract class Engine2D {
     }
 
     //API
-    fun putPixel(x: Int, y: Int, color: Color) {
+    fun putPixel(x: Int, y: Int, color: Color, alpha: Float = 1.0f) {
         if (x < 0 || x >= width || y < 0 || y >= height) return
         val index = (y * width + x) * 3
-        pixelData[index] = color.r
-        pixelData[index + 1] = color.g
-        pixelData[index + 2] = color.b
+        
+        if (alpha >= 1.0f) {
+            pixelData[index] = color.r
+            pixelData[index + 1] = color.g
+            pixelData[index + 2] = color.b
+        } else {
+            // Alpha Blending
+            val bgR = pixelData[index]
+            val bgG = pixelData[index + 1]
+            val bgB = pixelData[index + 2]
+            pixelData[index] = color.r * alpha + bgR * (1.0f - alpha)
+            pixelData[index + 1] = color.g * alpha + bgG * (1.0f - alpha)
+            pixelData[index + 2] = color.b * alpha + bgB * (1.0f - alpha)
+        }
+    }
+
+    fun drawLine(x0: Int, y0: Int, x1: Int, y1: Int, color: Color) {
+        if (isAntialiasingEnabled) {
+            drawLineWu(x0, y0, x1, y1, color)
+        } else {
+            drawLineBresenham(x0, y0, x1, y1, color)
+        }
+    }
+
+    private fun drawLineBresenham(startX: Int, startY: Int, endX: Int, endY: Int, color: Color) {
+        var x = startX; var y = startY
+        val dx = kotlin.math.abs(endX - startX); val dy = kotlin.math.abs(endY - startY)
+        val sx = if (startX < endX) 1 else -1; val sy = if (startY < endY) 1 else -1
+        var err = (if (dx > dy) dx else -dy) / 2
+        while (true) {
+            putPixel(x, y, color)
+            if (x == endX && y == endY) break
+            val e2 = err
+            if (e2 > -dx) { err -= dy; x += sx }
+            if (e2 < dy) { err += dx; y += sy }
+        }
+    }
+
+    private fun drawLineWu(startX: Int, startY: Int, endX: Int, endY: Int, color: Color) {
+        var x0 = startX; var y0 = startY; var x1 = endX; var y1 = endY
+        val steep = kotlin.math.abs(y1 - y0) > kotlin.math.abs(x1 - x0)
+        
+        if (steep) {
+            var tmp = x0; x0 = y0; y0 = tmp
+            tmp = x1; x1 = y1; y1 = tmp
+        }
+        if (x0 > x1) {
+            var tmp = x0; x0 = x1; x1 = tmp
+            tmp = y0; y0 = y1; y1 = tmp
+        }
+
+        val dx = x1 - x0
+        val dy = y1 - y0
+        
+        // Aritmética de punto fijo (Fixed Point) - 8 bits de fracción (16.8)
+        val gradient = if (dx == 0) (1 shl 8) else ((dy shl 8) / dx)
+        var yAcc = y0 shl 8
+
+        for (x in x0..x1) {
+            val yPix = yAcc shr 8
+            val fraction = yAcc and 255
+            
+            val alpha2 = fraction / 255.0f
+            val alpha1 = 1.0f - alpha2
+
+            if (steep) {
+                putPixel(yPix, x, color, alpha1)
+                putPixel(yPix + 1, x, color, alpha2)
+            } else {
+                putPixel(x, yPix, color, alpha1)
+                putPixel(x, yPix + 1, color, alpha2)
+            }
+            
+            yAcc += gradient
+        }
     }
 
     fun clear(color: Color) {

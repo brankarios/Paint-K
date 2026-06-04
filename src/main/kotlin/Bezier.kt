@@ -15,7 +15,7 @@ class Bezier(
             if (controlPoints.size > 1) {
                 val polygonColor = Color(0.5f, 0.5f, 0.5f) 
                 for (i in 0 until controlPoints.size - 1) {
-                    drawLine(engine, controlPoints[i].x.toInt(), controlPoints[i].y.toInt(), 
+                    engine.drawLine(controlPoints[i].x.toInt(), controlPoints[i].y.toInt(), 
                              controlPoints[i+1].x.toInt(), controlPoints[i+1].y.toInt(), polygonColor)
                 }
             }
@@ -43,7 +43,7 @@ class Bezier(
             val currX = point.x.toInt()
             val currY = point.y.toInt()
 
-            drawLine(engine, prevX, prevY, currX, currY, borderColor)
+            engine.drawLine(prevX, prevY, currX, currY, borderColor)
             prevX = currX
             prevY = currY
         }
@@ -85,23 +85,6 @@ class Bezier(
         controlPoints = newPoints
     }
 
-    private fun drawLine(engine: Engine2D, startX: Int, startY: Int, endX: Int, endY: Int, color: Color) {
-        var x = startX
-        var y = startY
-        val dx = kotlin.math.abs(endX - startX)
-        val dy = kotlin.math.abs(endY - startY)
-        val sx = if (startX < endX) 1 else -1
-        val sy = if (startY < endY) 1 else -1
-        var err = (if (dx > dy) dx else -dy) / 2
-
-        while (true) {
-            engine.putPixel(x, y, color)
-            if (x == endX && y == endY) break
-            val e2 = err
-            if (e2 > -dx) { err -= dy; x += sx }
-            if (e2 < dy) { err += dx; y += sy }
-        }
-    }
 
     override fun getBounds(): BoundingBox {
         if (controlPoints.isEmpty()) return BoundingBox(0.0, 0.0, 0.0, 0.0)
