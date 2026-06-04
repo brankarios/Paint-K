@@ -82,6 +82,13 @@
                 <Label style="-fx-font-weight: bold; -fx-text-fill: white; -fx-font-size: 14px;" text="Propiedades de Figura" />
                 <Label fx:id="lblNoSelection" style="-fx-text-fill: #aaaaaa;" text="Ninguna figura seleccionada" />
                 <javafx.scene.layout.VBox fx:id="pointsContainer" spacing="8.0" />
+                
+                <Separator prefWidth="200.0" />
+                <Label style="-fx-font-weight: bold; -fx-text-fill: white;" text="Escala (Zoom)" />
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Button mnemonicParsing="false" onAction="#scaleSelectedDown" prefWidth="35.0" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;" text="-" />
+                    <Button mnemonicParsing="false" onAction="#scaleSelectedUp" prefWidth="35.0" style="-fx-background-color: #3e3e3e; -fx-text-fill: white; -fx-cursor: hand; -fx-font-weight: bold;" text="+" />
+                </HBox>
             </children>
         </javafx.scene.layout.VBox>
     </right>

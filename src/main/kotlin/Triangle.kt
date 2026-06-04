@@ -59,6 +59,16 @@ class Triangle(
         y2 += dy.toInt()
     }
 
+    override fun scale(factor: Double) {
+        val center = getCenter()
+        x0 = (center.x + (x0 - center.x) * factor).toInt()
+        y0 = (center.y + (y0 - center.y) * factor).toInt()
+        x1 = (center.x + (x1 - center.x) * factor).toInt()
+        y1 = (center.y + (y1 - center.y) * factor).toInt()
+        x2 = (center.x + (x2 - center.x) * factor).toInt()
+        y2 = (center.y + (y2 - center.y) * factor).toInt()
+    }
+
     override fun setColor(newBorder: Color, newFill: Color?) {
         borderColor = newBorder
         fillColor = newFill

@@ -109,6 +109,11 @@ class Circle(
         y1 += dy.toInt()
     }
 
+    override fun scale(factor: Double) {
+        x1 = (x0 + (x1 - x0) * factor).toInt()
+        y1 = (y0 + (y1 - y0) * factor).toInt()
+    }
+
     override fun setColor(newBorder: Color, newFill: Color?) {
         borderColor = newBorder
         fillColor = newFill

@@ -124,6 +124,14 @@ class Bezier(
         }
     }
 
+    override fun scale(factor: Double) {
+        val center = getCenter()
+        for (p in controlPoints) {
+            p.x = center.x + (p.x - center.x) * factor
+            p.y = center.y + (p.y - center.y) * factor
+        }
+    }
+
     override fun setColor(newBorder: Color, newFill: Color?) {
         borderColor = newBorder
     }

@@ -25,6 +25,9 @@ abstract class Shape(var borderColor: Color, var zIndex: Int = 0) {
     // Mueve la figura completa sumando dx y dy a todos sus puntos
     abstract fun translate(dx: Double, dy: Double)
     
+    // Escala la figura por un factor dado
+    abstract fun scale(factor: Double)
+    
     // Cambia el color de borde (y relleno si la figura lo soporta)
     abstract fun setColor(newBorder: Color, newFill: Color? = null)
     

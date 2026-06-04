@@ -222,6 +222,21 @@ class Proyecto1 : Engine2D() {
             }
         }
     }
+    @FXML fun scaleSelectedUp() {
+        selectedShape?.let {
+            saveState()
+            it.scale(1.1)
+            updatePropertiesPanel()
+        }
+    }
+
+    @FXML fun scaleSelectedDown() {
+        selectedShape?.let {
+            saveState()
+            it.scale(0.9)
+            updatePropertiesPanel()
+        }
+    }
 
     private fun updatePropertiesPanel() {
         if (!::propertiesPanel.isInitialized) return
