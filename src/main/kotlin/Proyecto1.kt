@@ -39,8 +39,10 @@ class Proyecto1 : Engine2D() {
     private var isDrawing = false
     private var currentTool = Tool.LINE 
     private var isFilled = false
-    
+    private var clipboardShape: Shape? = null
     private var showQuadTree = false
+
+    // Estados para historial
     private var selectedShape: Shape? = null
     private var selectedControlPointIndex: Int? = null
     private var quadTree: QuadTree = QuadTree(BoundingBox(0.0, 0.0, 1024.0, 600.0))
@@ -235,6 +237,42 @@ class Proyecto1 : Engine2D() {
             saveState()
             it.scale(0.9)
             updatePropertiesPanel()
+        }
+    }
+
+    @FXML fun copySelected() {
+        selectedShape?.let {
+            clipboardShape = it.clone()
+            println("Copiado al portapapeles")
+        }
+    }
+
+    @FXML fun cutSelected() {
+        selectedShape?.let {
+            saveState()
+            clipboardShape = it.clone()
+            shapes.remove(it)
+            selectedShape = null
+            updatePropertiesPanel()
+            println("Cortado al portapapeles")
+        }
+    }
+
+    @FXML fun pasteClipboard() {
+        clipboardShape?.let {
+            saveState()
+            val newShape = it.clone()
+            
+            // Centrar la figura exactamente donde está el ratón
+            val center = newShape.getCenter()
+            val dx = lastMouseX - center.x.toInt()
+            val dy = lastMouseY - center.y.toInt()
+            newShape.translate(dx.toDouble(), dy.toDouble())
+            
+            shapes.add(newShape)
+            selectedShape = newShape
+            updatePropertiesPanel()
+            println("Pegado desde portapapeles en ($lastMouseX, $lastMouseY)")
         }
     }
 
@@ -437,10 +475,20 @@ class Proyecto1 : Engine2D() {
                 println("Herramienta: Rectangulo")
             }
             KeyCode.C -> {
-                currentTool = Tool.CIRCLE
-                currentShape = null
-                updateActiveButtonUI()
-                println("Herramienta: Circulo")
+                if (isKeyPressed(KeyCode.CONTROL)) {
+                    copySelected()
+                } else {
+                    currentTool = Tool.CIRCLE
+                    currentShape = null
+                    updateActiveButtonUI()
+                    println("Herramienta: Circulo")
+                }
+            }
+            KeyCode.X -> {
+                if (isKeyPressed(KeyCode.CONTROL)) cutSelected()
+            }
+            KeyCode.V -> {
+                if (isKeyPressed(KeyCode.CONTROL)) pasteClipboard()
             }
             KeyCode.T -> {
                 currentTool = Tool.TRIANGLE
