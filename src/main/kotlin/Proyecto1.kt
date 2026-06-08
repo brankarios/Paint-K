@@ -277,6 +277,22 @@ class Proyecto1 : Engine2D() {
         }
     }
 
+    @FXML fun increaseZIndex() {
+        selectedShape?.let {
+            saveState()
+            it.zIndex += 1
+            println("Z-Index aumentado a ${it.zIndex}")
+        }
+    }
+
+    @FXML fun decreaseZIndex() {
+        selectedShape?.let {
+            saveState()
+            it.zIndex -= 1
+            println("Z-Index disminuido a ${it.zIndex}")
+        }
+    }
+
     private fun updatePropertiesPanel() {
         if (!::propertiesPanel.isInitialized) return
         val shape = selectedShape
@@ -335,7 +351,8 @@ class Proyecto1 : Engine2D() {
             quadTree.insert(shape)
         }
 
-        // 3. Dibujamos TODAS las figuras que ya están guardadas en nuestra lista de memoria
+        // 3. Ordenamos las figuras por su Z-Index (Algoritmo del Pintor) y las dibujamos
+        shapes.sortBy { it.zIndex }
         for (shape in shapes) {
             shape.draw(this)
         }

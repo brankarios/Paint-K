@@ -107,6 +107,17 @@
                 <javafx.scene.layout.VBox fx:id="pointsContainer" spacing="8.0" />
                 
                 <Separator prefWidth="200.0" />
+                <Label styleClass="etiqueta-titulo" text="Capas (Z-Index)" />
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <Button mnemonicParsing="false" onAction="#decreaseZIndex" text="⬇">
+                        <tooltip><Tooltip text="Bajar Capa (-1)"/></tooltip>
+                    </Button>
+                    <Button mnemonicParsing="false" onAction="#increaseZIndex" text="⬆">
+                        <tooltip><Tooltip text="Subir Capa (+1)"/></tooltip>
+                    </Button>
+                </HBox>
+                
+                <Separator prefWidth="200.0" />
                 <Label styleClass="etiqueta-titulo" text="Escala (Zoom)" />
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <Button mnemonicParsing="false" onAction="#scaleSelectedDown" prefWidth="35.0" style="-fx-font-weight: bold;" text="-" />
