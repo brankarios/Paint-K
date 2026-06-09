@@ -241,6 +241,18 @@ class Proyecto1 : Engine2D() {
         }
     }
 
+    @FXML fun elevateBezierDegree() {
+        val shape = selectedShape
+        if (shape is Bezier) {
+            saveState()
+            shape.elevateDegree()
+            updatePropertiesPanel()
+            println("Grado elevado Puntos de control ${shape.controlPoints.size}")
+        } else {
+            println("Debe seleccionar curva bezier")
+        }
+    }
+
     @FXML fun copySelected() {
         selectedShape?.let {
             clipboardShape = it.clone()

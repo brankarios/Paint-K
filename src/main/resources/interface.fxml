@@ -106,6 +106,10 @@
                 <Label fx:id="lblNoSelection" styleClass="etiqueta-secundaria" text="Ninguna figura seleccionada" />
                 <javafx.scene.layout.VBox fx:id="pointsContainer" spacing="8.0" />
                 
+                <Button mnemonicParsing="false" onAction="#elevateBezierDegree" text="➕ Curva (+Punto)">
+                    <tooltip><Tooltip text="Aumentar grado de Bézier (Ctrl+E)"/></tooltip>
+                </Button>
+                
                 <Separator prefWidth="200.0" />
                 <Label styleClass="etiqueta-titulo" text="Capas (Z-Index)" />
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
