@@ -30,11 +30,18 @@ A low-level, high-performance 2D graphics rendering engine built from scratch in
 - **Low-Level Bridge:** LWJGL (Lightweight Java Game Library)
 - **Build Tool:** Maven
 
-## How to Run
+## How to Build and Run
 
-1. Make sure you have JDK 23+ (or Liberica JDK Full) and Maven installed.
-2. Clone the repository.
-3. Execute the following command in the project root:
+This project is packaged into a standalone "Fat JAR" containing all necessary JavaFX components.
+
+1. Ensure you have **Java 17+** and **Maven** installed.
+2. Open a terminal in the project root folder.
+3. Build the standalone JAR file by running:
    ```bash
-   mvn clean compile exec:java
+   mvn clean package
+   ```
+4. Navigate to the generated `target` directory and execute the JAR:
+   ```bash
+   cd target
+   java -jar proyecto1-K-1.0-SNAPSHOT-jar-with-dependencies.jar
    ```
