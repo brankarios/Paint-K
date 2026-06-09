@@ -28,10 +28,10 @@ abstract class Shape(var borderColor: Color, var zIndex: Int = 0) {
     // Escala la figura por un factor dado
     abstract fun scale(factor: Double)
     
-    // Cambia el color de borde (y relleno si la figura lo soporta)
+    // Cambia el color de borde y relleno, si tiene
     abstract fun setColor(newBorder: Color, newFill: Color? = null)
     
-    // Devuelve una copia independiente (Deep Copy) de la figura para el historial
+    // Devuelve una copia de la figura para el historial
     abstract fun clone(): Shape
     
     // Devuelve una representación en texto plano de la figura para guardado

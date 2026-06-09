@@ -25,7 +25,6 @@ class MotorApp : Application() {
         val root: Parent = loader.load()
         stage.title = "Proyecto #1 - Gestión y Despliegue de Primitivas"
         stage.scene = Scene(root)
-        // Alterar esto va a requerir hacer ciertos cambios para evitar errores
         stage.isResizable = false
         stage.show()
         stage.setOnCloseRequest {

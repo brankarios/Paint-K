@@ -79,7 +79,6 @@ class QuadTree(val boundary: BoundingBox, val capacity: Int = 4, val level: Int 
         }
     }
 
-    // Dibuja las líneas divisorias del árbol (Requisito tecla 'q')
     fun draw(engine: Engine2D) {
         val gridColor = Color(0.0f, 0.4f, 0.0f) // Verde oscuro tenue
         val minX = boundary.x.toInt()

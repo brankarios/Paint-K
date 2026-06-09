@@ -49,8 +49,8 @@ class Rectangle(
     }
 
     override fun getShapePoints(): List<Point2D> {
-        // En un rectángulo usamos las 4 esquinas como puntos de control para mayor naturalidad, o solo 2 (opuestas).
-        // Vamos a usar 2 puntos (las esquinas definidoras x0,y0 y x1,y1) para mantenerlo simple.
+        // 2 puntos (las esquinas definidoras x0,y0 y x1,y1)
+        // como puntos de control
         return listOf(Point2D(x0.toDouble(), y0.toDouble()), Point2D(x1.toDouble(), y1.toDouble()))
     }
 

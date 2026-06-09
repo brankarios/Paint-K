@@ -352,7 +352,7 @@ class Proyecto1 : Engine2D() {
         }
     }
 
-    // Este método es el Bucle de Juego (Game Loop), corre automáticamente 60 veces por segundo
+    // Game Loop 
     override fun update(deltaTime: Float) {
         // 1. Limpiamos toda la pantalla pintándola con el color de fondo dinámico
         clear(backgroundColor)
@@ -404,7 +404,7 @@ class Proyecto1 : Engine2D() {
                 }
             }
             
-            // Punto central para traslación completa (Magenta)
+            // Punto central para traslación completa (morado o casi púrpura)
             val center = it.getCenter()
             for (dx in -4..4) {
                 for (dy in -4..4) {
@@ -438,7 +438,7 @@ class Proyecto1 : Engine2D() {
             var targetX = lastMouseX
             var targetY = lastMouseY
 
-            // Si se oprime Ctrl, forzamos un cuadrado perfecto para Rectángulo y Círculo
+            // Cuadrado perfecto para Rectángulo y Círculo al presionar Ctrl
             if (isKeyPressed(KeyCode.CONTROL)) {
                 when (shape) {
                     is Rectangle -> {
@@ -700,7 +700,6 @@ class Proyecto1 : Engine2D() {
                 return
             }
 
-            // Hacemos una última actualización
             updateCurrentShape()
 
             if (currentTool != Tool.TRIANGLE && currentTool != Tool.BEZIER) {
@@ -760,7 +759,6 @@ class Proyecto1 : Engine2D() {
             hoveredShape = null
         }
 
-        // Permitimos actualizar aunque isDrawing sea false para el preview dinámico del triángulo sin hacer clic
         if (isDrawing || currentShape != null) {
             updateCurrentShape()
         }
