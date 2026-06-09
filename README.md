@@ -32,7 +32,16 @@ A low-level, high-performance 2D graphics rendering engine built from scratch in
 
 ## How to Build and Run
 
-This project is packaged into a standalone "Fat JAR" containing all necessary JavaFX components.
+There are two ways to run the project depending on your needs.
+
+### Option A: Fast Run (For Development)
+If you want to compile and execute the project immediately in a single command, run:
+```bash
+mvn clean compile exec:java
+```
+
+### Option B: Build Standalone JAR (For Distribution)
+This project can be packaged into a standalone "Fat JAR" containing all necessary JavaFX components.
 
 1. Ensure you have **Java 17+** and **Maven** installed.
 2. Open a terminal in the project root folder.
