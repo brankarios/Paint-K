@@ -15,6 +15,7 @@
         <lwjgl.version>3.4.1</lwjgl.version>
         <joml.version>1.10.8</joml.version>
         <lwjgl.natives>natives-windows</lwjgl.natives>
+        <kotlin.compiler.execution.strategy>in-process</kotlin.compiler.execution.strategy>
     </properties>
     <dependencyManagement>
         <dependencies>
